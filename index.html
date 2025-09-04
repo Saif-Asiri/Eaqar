@@ -4,16 +4,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Eaqar - بيع العقارات</title>
+  <title>أشعار - بيع العقارات</title>
   <link rel="icon" href="logo.png" />
   <meta name="color-scheme" content="light only"/>
 
   <style>
-    /* ===== لوحة ألوان محسّنة حسب طلبك ===== */
+    /* ===== لوحة ألوان ===== */
     :root{
       --brand:#1f8bcb;          /* الأزرق الرئيسي */
       --brand-dark:#144b81;     /* الأزرق الغامق */
-      --accent:#0fbf9f;         /* لون مساعد متناغم (تركواز) */
+      --accent:#0fbf9f;         /* لون مساعد متناغم */
       --surface:#ffffff;
       --surface-2:#f4f7fb;
       --text:#0f172a;
@@ -22,6 +22,7 @@
     }
 
     *{box-sizing:border-box}
+    html{ scroll-behavior:smooth; } /* تمرير ناعم لزر ابدأ البحث */
     body{
       margin:0;
       font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
@@ -49,7 +50,6 @@
     }
     .overlay{
       position:absolute; inset:0;
-      /* تدرج باستخدام اللونين الأساسيين */
       background:
         radial-gradient(1200px 600px at 80% -10%, rgba(31,139,203,.55), transparent 60%),
         linear-gradient(180deg, rgba(20,75,129,.82), rgba(20,75,129,.62) 35%, rgba(31,139,203,.45) 100%);
@@ -72,7 +72,6 @@
     }
     @keyframes rise{ from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:translateY(0)} }
 
-    /* شارة الشعار مع الصورة المطلوبة */
     .brand-badge{
       display:inline-flex; align-items:center; gap:10px;
       background: rgba(255,255,255,.14);
@@ -100,6 +99,8 @@
       color:#e8f2fb;
       max-width:720px;
     }
+
+    /* زر يبدأ البحث -> ينقلك لأسفل إلى قسم العقارات */
     .cta{
       display:inline-flex; align-items:center; gap:10px;
       padding:14px 22px;
@@ -109,36 +110,54 @@
       background: linear-gradient(135deg, var(--brand), #58b6e3);
       box-shadow: 0 10px 24px rgba(31,139,203,.35);
       transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      text-decoration:none;
     }
     .cta:hover{ transform: translateY(-2px); box-shadow: 0 16px 32px rgba(31,139,203,.45); filter:brightness(1.03); }
     .cta:active{ transform: translateY(0) scale(.98); }
 
-    /* ===== مربع التفاصيل (Stats) – جعلُه واضحًا فوق الفيديو ===== */
+    /* ===== مربع التفاصيل (Stats) – نسخة متجاوبة بالكامل ===== */
     .stats{
-      position:absolute; bottom:100px; left:50%; transform:translateX(-50%);
-      display:flex; gap:14px; align-items:center;
-      padding:10px 16px;
+      position:absolute; bottom:150px; left:50%; transform:translateX(-50%);
+      display:flex; align-items:center; gap:18px;
+      padding:12px 18px;
       border-radius:18px;
-
-      /* 1) خلفية شبه صلبة + بلور ليظهر بوضوح */
-      background: rgba(255,255,255,.9);
+      background: rgba(255,255,255,.92);
       -webkit-backdrop-filter: blur(6px);
       backdrop-filter: blur(6px);
-
-      /* 2) حدود وظل لرفع التباين */
       border:1px solid rgba(20,75,129,.25);
       box-shadow: 0 10px 26px rgba(0,0,0,.18);
-
-      /* 3) لون نص داكن واضح */
-      color: #123354;
-      font-weight:800;
+      color:#123354; font-weight:800;
     }
-    .stats .dot{
-      width:8px; height:8px; border-radius:50%;
-      background:var(--accent); display:inline-block
+    .stats .item{
+      display:flex; align-items:center; gap:10px;
+      white-space:nowrap;
     }
+    .stats .item b{ font-size:1.05rem; }
+    .stats .sep{ width:1px; height:20px; background:rgba(20,75,129,.25); }
+    .stats .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); }
     .stats .dot.secondary{ background:var(--brand) }
-    .stats .sep{ opacity:.35 }
+
+    /* — نسخة الهواتف: توسيع العرض، تحويلها إلى شبكية ثنائية — */
+    @media (max-width: 560px){
+      .stats{
+        bottom:14px;
+        width: calc(100% - 28px);
+        padding:12px;
+        gap:12px;
+        transform: translateX(-50%);
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        row-gap:10px;
+      }
+      .stats .item{
+        justify-content:center;
+        background: rgba(255,255,255,.96);
+        border:1px solid rgba(20,75,129,.18);
+        border-radius:12px;
+        padding:8px 10px;
+      }
+      .stats .sep{ display:none; } /* لا نحتاج فاصل عمودي في الشبكية */
+    }
 
     /* ===== قسم العقارات ===== */
     .properties{
@@ -195,9 +214,6 @@
 
     /* ===== مساعدات ===== */
     .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);border:0}
-    @media (max-width:560px){
-      .stats{ bottom: 18px; padding:8px 12px; }
-    }
   </style>
 </head>
 <body>
@@ -215,25 +231,35 @@
 
     <div class="hero-content">
       <div class="brand-badge">
-        <!-- صورة اللوجو من المسار الذي زوّدته: C:\Users\PC\eaqar\logo.png  -->
-        <img src="logo.png" alt="شعار Eaqar"/>
+        <img src="logo.png" alt="شعار أشعار"/>
         <span>منصة عقارية موثوقة</span>
       </div>
 
-      <h1>اكتشف <span class="mark">بيت أحلامك</span> مع Eaqar</h1>
+      <h1>اكتشف <span class="mark">بيت أحلامك</span> مع أشعار</h1>
       <p>نقدّم لك مجموعة مختارة من الفلل والشقق والأراضي بأفضل الأسعار وخيارات تمويل تناسبك.</p>
 
-      <button class="cta" onclick="location.href='contact.html'">
-        <span class="sr-only">الانتقال إلى صفحة التواصل</span>
+      <!-- زر ينقلك للأسفل إلى قسم العقارات -->
+      <a class="cta" href="#properties">
+        <span class="sr-only">الانتقال إلى قسم العقارات المميزة</span>
         ابدأ البحث الآن
-      </button>
+      </a>
     </div>
 
-    <!-- مربع التفاصيل الواضح الآن -->
+    <!-- مربع البيانات (متجاوب للهاتف) -->
     <div class="stats" aria-label="معلومات سريعة">
-      <span class="dot secondary"></span> +250 عقار مميز
-      <span class="sep">•</span>
-      <span class="dot"></span> تم البيع هذا الشهر: 38
+      <div class="item">
+        <span class="dot secondary"></span>
+        <b>+250</b>
+        <span>عقار مميز</span>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="item">
+        <span class="dot"></span>
+        <b>38</b>
+        <span>تم البيع هذا الشهر</span>
+      </div>
     </div>
   </section>
 

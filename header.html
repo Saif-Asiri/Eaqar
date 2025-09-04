@@ -1,0 +1,142 @@
+<!-- header.html -->
+<header class="site-header">
+  <a href="index.html" class="brand" aria-label="Eaqar - الصفحة الرئيسية">
+    <img src="logo.png" alt="شعار Eaqar" class="logo-img" />
+    <span class="logo-text">Eaqar</span>
+  </a>
+
+  <!-- مفتاح القائمة (لا يحتاج JS) -->
+  <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="فتح القائمة">
+
+  <!-- زر البرغر -->
+  <label for="nav-toggle" class="menu-toggle" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </label>
+
+  <!-- القائمة -->
+  <nav class="navbar" role="navigation" aria-label="القائمة الرئيسية">
+    <ul>
+      <li><a href="index.html" onclick="document.getElementById('nav-toggle').checked=false">الرئيسية</a></li>
+      <li><a href="#" onclick="document.getElementById('nav-toggle').checked=false">العقارات</a></li>
+      <li><a href="#" onclick="document.getElementById('nav-toggle').checked=false">من نحن</a></li>
+      <li><a href="contact.html" onclick="document.getElementById('nav-toggle').checked=false">اتصل بنا</a></li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+  :root{
+    --brand:#1f8bcb;          /* الأزرق الرئيسي */
+    --brand-dark:#144b81;     /* الأزرق الغامق */
+    --text:#ffffff;
+    --line:rgba(255,255,255,.12);
+  }
+
+  /* الهيدر */
+  .site-header{
+    background: linear-gradient(90deg, var(--brand-dark), var(--brand));
+    color: var(--text);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+  }
+
+  /* الشعار */
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    text-decoration:none;
+  }
+  .logo-img{
+    width:34px; height:34px; object-fit:contain;
+    background:#fff; border-radius:8px; padding:4px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+  }
+  .logo-text{
+    font-weight:800; font-size:1.3rem; letter-spacing:.2px; color:#fff;
+  }
+
+  /* قائمة سطح المكتب */
+  .navbar ul{
+    list-style:none;
+    display:flex;
+    gap:26px;
+    margin:0;
+    padding:0;
+  }
+  .navbar a{
+    color:#fff;
+    text-decoration:none;
+    font-size:1rem;
+    padding:8px 0;
+    transition:opacity .25s ease, color .25s ease;
+  }
+  .navbar a:hover{ color:#e6f5ff; opacity: .9; }
+
+  /* عناصر البرغر */
+  .nav-toggle{ display:none; } /* نخفي الـ checkbox */
+  .menu-toggle{
+    display:none;           /* يظهر فقط على الجوال */
+    cursor:pointer;
+    padding:6px 4px;
+    margin-right: 8px;
+  }
+  .menu-toggle span{
+    display:block;
+    width:28px;height:3px;
+    background:#fff;
+    border-radius:3px;
+    transition:transform .35s ease, opacity .25s ease;
+  }
+  .menu-toggle span + span{ margin-top:6px; }
+
+  /* الحالة المفتوحة: تحويل البرغر إلى X */
+  .nav-toggle:checked + .menu-toggle span:nth-child(1){ transform: translateY(9px) rotate(45deg); }
+  .nav-toggle:checked + .menu-toggle span:nth-child(2){ opacity:0; }
+  .nav-toggle:checked + .menu-toggle span:nth-child(3){ transform: translateY(-9px) rotate(-45deg); }
+
+  /* استجابة للجوال */
+  @media (max-width: 768px){
+    .menu-toggle{ display:block; }
+
+    .navbar{
+      position:absolute;
+      top:100%;
+      right:0; left:0;
+      background: linear-gradient(180deg, rgba(20,75,129,.98), rgba(31,139,203,.98));
+      max-height:0;
+      overflow:hidden;
+      opacity:0;
+      transform: translateY(-8px);
+      transition: max-height .4s ease, opacity .35s ease, transform .35s ease;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      z-index: 999;
+    }
+
+    .navbar ul{
+      flex-direction:column;
+      gap:0;
+      width:100%;
+    }
+    .navbar li{ border-top:1px solid var(--line); }
+    .navbar li:first-child{ border-top:none; }
+    .navbar a{
+      display:block;
+      padding:14px 18px;
+      text-align:center;
+    }
+
+    /* إبقاء العنصر موجوداً لكن مطوي */
+    .site-header .navbar{ display:block; }
+
+    /* فتح القائمة عند تفعيل الـ checkbox */
+    .nav-toggle:checked ~ .navbar{
+      max-height: 320px;
+      opacity:1;
+      transform: translateY(0);
+    }
+  }
+</style>

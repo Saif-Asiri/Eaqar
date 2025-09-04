@@ -1,0 +1,62 @@
+<!-- footer.html -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a href="index.html" class="brand" aria-label="الرجوع للصفحة الرئيسية">
+      <img src="logo.png" alt="شعار Eaqar" class="logo-img"/>
+      <span class="logo-text">Eaqar</span>
+    </a>
+
+    <nav class="footer-nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="#">العقارات</a>
+      <a href="#">من نحن</a>
+      <a href="contact.html">اتصل بنا</a>
+    </nav>
+
+    <p class="copy">جميع الحقوق محفوظة © 2025 Eaqar</p>
+  </div>
+</footer>
+
+<style>
+  :root{
+    --brand:#1f8bcb;
+    --brand-dark:#144b81;
+    --surface:#ffffff;
+  }
+
+  .site-footer{
+    background: linear-gradient(180deg, var(--brand-dark), var(--brand));
+    color:#fff;
+    margin-top:60px;
+  }
+  .footer-inner{
+    max-width:1200px; margin:0 auto;
+    padding:24px 16px 28px;
+    text-align:center;
+  }
+
+  .brand{
+    display:inline-flex; align-items:center; gap:10px;
+    text-decoration:none; color:#fff; margin-bottom:10px;
+  }
+  .logo-img{
+    width:30px; height:30px; object-fit:contain;
+    background:#fff; border-radius:8px; padding:4px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+  }
+  .logo-text{ font-weight:800; letter-spacing:.2px; }
+
+  .footer-nav{
+    margin:10px 0 8px;
+    display:flex; gap:18px; justify-content:center; flex-wrap:wrap;
+  }
+  .footer-nav a{
+    color:#eaf6ff; text-decoration:none; font-weight:600;
+    padding:6px 10px; border-radius:8px; transition: background .2s ease, color .2s ease;
+  }
+  .footer-nav a:hover{
+    background: rgba(255,255,255,.14); color:#fff;
+  }
+
+  .copy{ margin:10px 0 0; opacity:.9; font-size:.95rem; }
+</style>

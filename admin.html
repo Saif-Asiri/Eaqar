@@ -4,11 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>لوحة المشرف - Eaqar</title>
-  <link rel="icon" href="logo.png" 
+  <link rel="icon" href="logo.png"/>
   <meta name="color-scheme" content="light only"/>
 
   <style>
-    /* ===== هوية الألوان (مطابقة للصفحة الرئيسية) ===== */
     :root{
       --brand:#1f8bcb;
       --brand-dark:#144b81;
@@ -19,203 +18,115 @@
       --muted:#667085;
       --shadow:0 10px 30px rgba(0,0,0,.15);
       --ring: rgba(31,139,203,.25);
+      --new-indicator:#63b3ed;
     }
-
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
-      color:var(--text);
-      background:var(--surface-2);
-    }
+    body{margin:0;font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;color:var(--text);background:var(--surface-2)}
 
-    /* ===== رأس الصفحة (Brand Bar) ===== */
-    .topbar{
-      position:sticky; top:0; z-index:10;
-      background:
-        radial-gradient(900px 500px at 85% -10%, rgba(31,139,203,.25), transparent 60%),
-        linear-gradient(180deg, var(--brand-dark), #1f79b4);
-      color:#fff;
-      border-bottom:1px solid rgba(255,255,255,.2);
-      box-shadow:0 8px 18px rgba(0,0,0,.16);
-    }
-    .topbar-inner{
-      max-width:1200px; margin:0 auto;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:14px 16px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:10px; font-weight:900;
-      letter-spacing:.2px;
-    }
+    .topbar{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--brand-dark),#1f79b4);color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.16)}
+    .topbar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900}
     .brand img{width:34px;height:34px;border-radius:8px;background:#fff;object-fit:contain}
-    .top-actions{display:flex; gap:10px; align-items:center;}
+    .btn{padding:8px 14px;border-radius:999px;border:1px solid rgba(20,75,129,.18);background:#fff;color:var(--brand-dark);font-weight:800;cursor:pointer}
+    .btn--primary{background:linear-gradient(135deg,var(--brand),#58b6e3);border:none;color:#062a46;box-shadow:0 10px 22px rgba(31,139,203,.3)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
 
-    /* أزرار متطابقة */
-    .btn{
-      padding:10px 14px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.35);
-      background:#fff; color:var(--brand-dark); font-weight:800; cursor:pointer;
-    }
-    .btn--primary{
-      background: linear-gradient(135deg, var(--brand), #58b6e3);
-      border:none; color:#062a46; box-shadow:0 10px 22px rgba(31,139,203,.3);
-    }
-    .btn:disabled{opacity:.6; cursor:not-allowed}
+    .wrap{max-width:1200px;margin:22px auto 40px;padding:0 16px}
+    .card{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);border:1px solid rgba(20,75,129,.08)}
 
-    /* ===== غلاف المحتوى ===== */
-    .wrap{ max-width:1200px; margin:22px auto 40px; padding:0 16px; }
-
-    /* بطاقات */
-    .card{
-      background:var(--surface);
-      border-radius:18px;
-      box-shadow:var(--shadow);
-      border:1px solid rgba(20,75,129,.08);
-    }
-
-    /* نموذج الدخول */
-    .login{
-      max-width:520px; margin:64px auto;
-      padding:22px;
-    }
-    .login h2{margin:0 0 6px; color:var(--brand-dark); text-align:center}
-    .login p{margin:0 0 16px; color:var(--muted); text-align:center}
+    /* نموذج تسجيل الدخول */
+    .login{max-width:520px;margin:64px auto;padding:22px}
+    .login h2{margin:0 0 6px;text-align:center;color:var(--brand-dark)}
+    .login p{text-align:center;color:var(--muted);margin:0 0 16px}
     .field{margin-bottom:12px}
-    .control{
-      width:100%; padding:12px 14px; border-radius:12px;
-      border:1px solid #d4dbe7; background:#f9fbfe; font-size:1rem; outline:none;
-      transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
-    }
-    .control:focus{border-color:var(--brand); box-shadow:0 0 0 4px var(--ring); background:#fff}
-    .error{color:#dc2626; text-align:center; display:none; margin-top:6px}
+    .control{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #d4dbe7;background:#f9fbfe;font-size:1rem}
+    .control:focus{border-color:var(--brand);box-shadow:0 0 0 4px var(--ring);background:#fff}
+    .error{color:#dc2626;text-align:center;display:none;margin-top:6px}
 
-    /* لوحة التحكم */
-    .dashboard{ padding:18px }
-    .grid{ display:grid; gap:16px; grid-template-columns: 1fr; }
-    @media(min-width:900px){ .grid{ grid-template-columns: .45fr 1fr; } }
+    .dashboard{padding:18px}
+    .grid{display:grid;gap:16px}
+    @media(min-width:900px){.grid{grid-template-columns:.45fr 1fr}}
 
-    /* بطاقة إحصاءات */
-    .stats{
-      padding:16px;
-      display:grid; gap:12px;
-    }
-    .stat{
-      border:1px dashed rgba(20,75,129,.18);
-      border-radius:14px; padding:14px;
-      display:flex; align-items:center; gap:12px;
-      background:linear-gradient(180deg, rgba(20,75,129,.05), rgba(31,139,203,.06));
-      color:#123354; font-weight:800;
-    }
-    .stat .chip{min-width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:#fff;border:1px solid rgba(31,139,203,.25);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    /* صندوق الإحصائيات (تصغير وتحسين المظهر) */
+    .stats{padding:12px;display:grid;gap:10px}
+    .stat{border:1px dashed rgba(20,75,129,.18);border-radius:12px;padding:10px;display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,rgba(20,75,129,.04),rgba(31,139,203,.05));color:#123354;font-weight:700;font-size:.9rem}
+    .stat .chip{min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:#fff;border:1px solid rgba(31,139,203,.25);font-size:.9rem}
 
-    /* أدوات الجدول */
-    .toolbar{
-      padding:12px 16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
-      border-bottom:1px solid rgba(20,75,129,.08);
+    .toolbar{padding:12px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(20,75,129,.08)}
+    .search{display:flex;align-items:center;gap:10px;background:#f9fbfe;border:1px solid #d4dbe7;border-radius:12px;padding:6px 10px;min-width:260px}
+    .search input{border:none;outline:none;background:transparent;width:180px}
+    .filter-buttons{display:flex;gap:8px;flex-wrap:wrap}
+
+    .badge{display:none;min-width:18px;padding:2px 6px;border-radius:999px;font-size:.8rem;font-weight:700;background:var(--brand);color:#fff;margin-inline-start:4px}
+
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #eef2f7;text-align:right;font-size:.9rem}
+    th{position:sticky;top:0;color:#fff;background:var(--brand-dark)}
+    tr:hover td{background:#f9fbfe}
+    .empty{padding:20px;text-align:center;color:var(--muted)}
+
+    .new-indicator{width:10px;height:10px;border-radius:50%;background:var(--new-indicator);display:inline-block;margin-inline-end:6px}
+
+    /* زر الحذف */
+    .delete-btn{
+      background:#e2e8f0;
+      color:#444;
+      border:none;
+      border-radius:6px;
+      padding:4px 8px;
+      font-size:.8rem;
+      cursor:pointer;
+      transition:background .2s ease,color .2s ease;
     }
-    .search{
-      display:flex; align-items:center; gap:10px;
-      background:#f9fbfe; border:1px solid #d4dbe7; border-radius:12px; padding:6px 10px;
-      min-width:260px;
-    }
-    .search input{
-      border:none; outline:none; background:transparent; width:180px; font-size:.95rem;
+    .delete-btn:hover{
+      background:#dc2626;
+      color:#fff;
     }
 
-    /* جدول الرسائل */
-    .table-wrap{ overflow:auto; }
-    table{ width:100%; border-collapse:collapse; }
-    th, td{ padding:12px 12px; border-bottom:1px solid #eef2f7; text-align:right; font-size:.96rem; }
-    th{
-      position:sticky; top:0; z-index:1; color:#fff;
-      background:var(--brand-dark);
-    }
-    tr:hover td{ background:#f9fbfe; }
-    .empty{ padding:26px; text-align:center; color:var(--muted); }
-
-    /* توست */
-    .toast{
-      position:fixed; inset-inline-start:16px; bottom:16px; z-index:50;
-      background:#0fddbd; color:#05343a; padding:12px 16px; border-radius:12px; box-shadow:var(--shadow); display:none; font-weight:800;
-    }
-    .toast.show{ display:block; animation: pop .4s ease both; }
-    @keyframes pop{ from{ transform: translateY(8px); opacity:0 } to{ transform:none; opacity:1 } }
+    .toast{position:fixed;inset-inline-start:16px;bottom:16px;z-index:50;background:#0fddbd;color:#05343a;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);display:none;font-weight:800}
+    .toast.show{display:block;animation:pop .4s ease both}
+    @keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
   </style>
 </head>
 <body>
-
-  <!-- رأس متطابق مع الهوية -->
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="brand">
-        <img src="logo.png" alt="شعار Eaqar">
-        <div>لوحة إدارة Eaqar</div>
-      </div>
-      <div class="top-actions">
-        <button id="btnSignOut" class="btn" style="display:none;">تسجيل الخروج</button>
-      </div>
+      <div class="brand"><img src="logo.png" alt="شعار Eaqar"><div>لوحة إدارة Eaqar</div></div>
+      <div class="top-actions"><button id="btnSignOut" class="btn" style="display:none;">تسجيل الخروج</button></div>
     </div>
   </header>
 
-  <!-- صندوق تسجيل الدخول -->
-  <section id="loginSection" class="card login" aria-label="تسجيل الدخول للمشرف">
+  <!-- نموذج تسجيل الدخول -->
+  <section id="loginSection" class="card login">
     <h2>تسجيل دخول المشرف</h2>
     <p>سجّل الدخول ببريد المشرف للوصول إلى الرسائل</p>
-    <div class="field">
-      <input id="email" class="control" type="email" placeholder="البريد الإلكتروني" autocomplete="username" required>
-    </div>
-    <div class="field">
-      <input id="password" class="control" type="password" placeholder="كلمة المرور" autocomplete="current-password" required>
-    </div>
+    <div class="field"><input id="email" class="control" type="email" placeholder="البريد الإلكتروني" autocomplete="username"></div>
+    <div class="field"><input id="password" class="control" type="password" placeholder="كلمة المرور" autocomplete="current-password"></div>
     <button id="btnLogin" class="btn btn--primary" style="width:100%;">دخول</button>
     <div id="loginError" class="error">فشل تسجيل الدخول، تأكد من البيانات.</div>
   </section>
 
-  <!-- لوحة التحكم -->
   <main id="dashboardSection" class="wrap" style="display:none;">
     <div class="grid">
-      <!-- إحصاءات -->
-      <aside class="card stats" aria-label="إحصاءات سريعة">
-        <div class="stat">
-          <span class="chip">📨</span>
-          <div>
-            إجمالي الرسائل<br>
-            <b id="statTotal">0</b>
-          </div>
-        </div>
-        <div class="stat">
-          <span class="chip">🔎</span>
-          <div>بحث فوري – اكتب لتصفية النتائج</div>
-        </div>
-        <div class="stat">
-          <span class="chip">⬇️</span>
-          <div>تصدير CSV بنقرة واحدة</div>
-        </div>
+      <aside class="card stats">
+        <div class="stat"><span class="chip">📨</span><div>إجمالي الرسائل<br><b id="statTotal">0</b></div></div>
+        <div class="stat"><span class="chip">🆕</span><div>الرسائل الجديدة<br><b id="statNew">0</b></div></div>
+        <div class="stat"><span class="chip">✅</span><div>المقروءة<br><b id="statRead">0</b></div></div>
       </aside>
-
-      <!-- جدول -->
       <section class="card">
         <div class="toolbar">
-          <div class="search">
-            <span>🔍</span>
-            <input id="searchInput" type="search" placeholder="ابحث باسم/بريد/جوال/رسالة…">
-          </div>
-          <div>
+          <div class="search"><span>🔍</span><input id="searchInput" type="search" placeholder="ابحث…"></div>
+          <div class="filter-buttons">
+            <button id="btnAll" class="btn btn--primary">الكل</button>
+            <button id="btnNew" class="btn">الرسائل الجديدة <span id="badgeNew" class="badge">0</span></button>
+            <button id="btnRead" class="btn">الرسائل المقروءة</button>
             <button id="btnExport" class="btn">تصدير CSV</button>
           </div>
         </div>
         <div class="table-wrap">
-          <table aria-label="قائمة الرسائل">
-            <thead>
-              <tr>
-                <th>الاسم</th>
-                <th>البريد</th>
-                <th>الجوال</th>
-                <th>الرسالة</th>
-                <th>التاريخ</th>
-              </tr>
-            </thead>
+          <table>
+            <thead><tr><th></th><th>الاسم</th><th>البريد</th><th>الجوال</th><th>الرسالة</th><th>التاريخ</th><th>إجراء</th></tr></thead>
             <tbody id="tbody"></tbody>
           </table>
           <div id="emptyState" class="empty" style="display:none;">لا توجد بيانات</div>
@@ -224,165 +135,70 @@
     </div>
   </main>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast"></div>
 
-  <!-- Firebase + المنطق -->
   <script type="module">
-    /* ===== Firebase SDKs ===== */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    /* ===== إعدادات مشروعك ===== */
-    const firebaseConfig = {
-      apiKey: "AIzaSyCDjLeMPjw6k5KaoHmD64AoBccr70w1FjY",
-      authDomain: "eaqar-contact.firebaseapp.com",
-      projectId: "eaqar-contact",
-      storageBucket: "eaqar-contact.firebasestorage.app",
-      messagingSenderId: "547232219651",
-      appId: "1:547232219651:web:89b9d5476da967fe3e8436"
-    };
+    const firebaseConfig={apiKey:"AIzaSyCDjLeMPjw6k5KaoHmD64AoBccr70w1FjY",authDomain:"eaqar-contact.firebaseapp.com",projectId:"eaqar-contact",storageBucket:"eaqar-contact.firebasestorage.app",messagingSenderId:"547232219651",appId:"1:547232219651:web:89b9d5476da967fe3e8436"};
+    const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db   = getFirestore(app);
+    const loginSection=document.getElementById('loginSection');
+    const dashboard=document.getElementById('dashboardSection');
+    const loginBtn=document.getElementById('btnLogin');
+    const signOutBtn=document.getElementById('btnSignOut');
+    const loginError=document.getElementById('loginError');
+    const tbody=document.getElementById('tbody');
+    const emptyState=document.getElementById('emptyState');
+    const statTotal=document.getElementById('statTotal');
+    const statNew=document.getElementById('statNew');
+    const statRead=document.getElementById('statRead');
+    const searchInput=document.getElementById('searchInput');
+    const exportBtn=document.getElementById('btnExport');
+    const toast=document.getElementById('toast');
+    const btnAll=document.getElementById('btnAll');
+    const btnNew=document.getElementById('btnNew');
+    const btnRead=document.getElementById('btnRead');
+    const badgeNew=document.getElementById('badgeNew');
 
-    /* ===== عناصر الصفحة ===== */
-    const loginSection   = document.getElementById('loginSection');
-    const dashboard      = document.getElementById('dashboardSection');
-    const loginBtn       = document.getElementById('btnLogin');
-    const signOutBtn     = document.getElementById('btnSignOut');
-    const loginError     = document.getElementById('loginError');
-    const tbody          = document.getElementById('tbody');
-    const emptyState     = document.getElementById('emptyState');
-    const statTotal      = document.getElementById('statTotal');
-    const searchInput    = document.getElementById('searchInput');
-    const exportBtn      = document.getElementById('btnExport');
-    const toast          = document.getElementById('toast');
+    let allRows=[];let currentFilter="all";
 
-    function showToast(msg){
-      toast.textContent = msg; toast.classList.add('show');
-      setTimeout(()=> toast.classList.remove('show'), 2500);
+    function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2500)}
+
+    onAuthStateChanged(auth,(user)=>{if(user){loginSection.style.display='none';dashboard.style.display='block';signOutBtn.style.display='inline-block';attachRealtime();}else{dashboard.style.display='none';signOutBtn.style.display='none';loginSection.style.display='block';}});
+
+    loginBtn.addEventListener('click',async()=>{loginError.style.display='none';const email=document.getElementById('email').value.trim();const pass=document.getElementById('password').value.trim();if(!email||!pass){loginError.textContent='أدخل البريد وكلمة المرور';loginError.style.display='block';return}try{await signInWithEmailAndPassword(auth,email,pass);showToast('تم تسجيل الدخول ✅')}catch{loginError.textContent='بيانات الدخول غير صحيحة';loginError.style.display='block';}});
+
+    signOutBtn.addEventListener('click',async()=>{await signOut(auth);showToast('تم تسجيل الخروج');tbody.innerHTML='';statTotal.textContent='0'});
+
+    function attachRealtime(){const q=query(collection(db,'messages'),orderBy('createdAt','desc'));onSnapshot(q,(snap)=>{allRows=[];snap.forEach(docSnap=>{const d=docSnap.data();allRows.push({id:docSnap.id,name:d.name||'',email:d.email||'',phone:d.phone||'',message:d.message||'',read:d.read===true,date:d.createdAt?.toDate?d.createdAt.toDate():null});});updateStats();renderTable();},()=>showToast('تعذر تحميل البيانات'))}
+
+    function updateStats(){
+      const total=allRows.length;
+      const newCount=allRows.filter(r=>!r.read).length;
+      const readCount=total-newCount;
+      statTotal.textContent=total;
+      statNew.textContent=newCount;
+      statRead.textContent=readCount;
+      if(newCount>0){badgeNew.style.display='inline-block';badgeNew.textContent=newCount;}else{badgeNew.style.display='none';}
     }
 
-    /* ===== حالة المصادقة ===== */
-    onAuthStateChanged(auth, (user)=>{
-      if(user){
-        loginSection.style.display = 'none';
-        dashboard.style.display    = 'block';
-        signOutBtn.style.display   = 'inline-block';
-        attachRealtime();
-      }else{
-        dashboard.style.display    = 'none';
-        signOutBtn.style.display   = 'none';
-        loginSection.style.display = 'block';
-      }
-    });
+    function renderTable(){let rows=[...allRows];if(currentFilter==="new")rows=rows.filter(r=>!r.read);if(currentFilter==="read")rows=rows.filter(r=>r.read);const q=searchInput.value.toLowerCase().trim();if(q)rows=rows.filter(r=>(r.name+r.email+r.phone+r.message).toLowerCase().includes(q));tbody.innerHTML='';if(rows.length===0){emptyState.style.display='block';return}emptyState.style.display='none';for(const r of rows){const tr=document.createElement('tr');tr.addEventListener('click',()=>markAsRead(r));const indicatorCell=document.createElement('td');if(!r.read){const dot=document.createElement('span');dot.className='new-indicator';indicatorCell.appendChild(dot);}tr.appendChild(indicatorCell);tr.appendChild(td(r.name));tr.appendChild(td(r.email));tr.appendChild(td(r.phone));tr.appendChild(td(r.message));tr.appendChild(td(r.date?r.date.toLocaleString('ar-SA'):''));const actionCell=document.createElement('td');const delBtn=document.createElement('button');delBtn.textContent="حذف";delBtn.className="delete-btn";delBtn.addEventListener('click',(e)=>{e.stopPropagation();deleteMessage(r)});actionCell.appendChild(delBtn);tr.appendChild(actionCell);tbody.appendChild(tr);}}function td(text){const cell=document.createElement('td');cell.textContent=text||'';return cell}
 
-    /* ===== تسجيل الدخول ===== */
-    loginBtn.addEventListener('click', async ()=>{
-      loginError.style.display = 'none';
-      const email = (document.getElementById('email').value || '').trim();
-      const pass  = (document.getElementById('password').value || '').trim();
-      if(!email || !pass){ loginError.textContent = 'أدخل البريد وكلمة المرور'; loginError.style.display='block'; return; }
-      try{
-        await signInWithEmailAndPassword(auth, email, pass);
-        showToast('تم تسجيل الدخول بنجاح ✅');
-      }catch(err){
-        loginError.textContent = 'بيانات الدخول غير صحيحة'; loginError.style.display='block';
-      }
-    });
+    async function markAsRead(r){if(r.read)return;try{await updateDoc(doc(db,'messages',r.id),{read:true});}catch(e){console.error(e)}}
 
-    /* ===== تسجيل الخروج ===== */
-    signOutBtn.addEventListener('click', async ()=>{
-      await signOut(auth);
-      showToast('تم تسجيل الخروج');
-      // تنظيف الجدول
-      tbody.innerHTML = ''; statTotal.textContent = '0';
-    });
+    async function deleteMessage(r){if(!confirm("هل تريد حذف هذه الرسالة؟"))return;try{await deleteDoc(doc(db,'messages',r.id));showToast('تم حذف الرسالة');}catch(e){console.error(e);showToast('فشل حذف الرسالة');}}
 
-    /* ===== جلب فوري للرسائل + بحث محلي ===== */
-    let allRows = []; // مخزن للعرض والبحث
-    function attachRealtime(){
-      const q = query(collection(db, 'messages'), orderBy('createdAt','desc'));
-      onSnapshot(q, (snap)=>{
-        allRows = [];
-        snap.forEach(doc=>{
-          const d = doc.data();
-          allRows.push({
-            name: d.name || '',
-            email: d.email || '',
-            phone: d.phone || '',
-            message: d.message || '',
-            date: d.createdAt?.toDate ? d.createdAt.toDate() : null
-          });
-        });
-        statTotal.textContent = allRows.length.toString();
-        renderTable(allRows);
-      }, (err)=> {
-        console.error(err);
-        showToast('تعذر تحميل البيانات');
-      });
-    }
+    searchInput.addEventListener('input',renderTable);
+    btnAll.addEventListener('click',()=>{currentFilter="all";setActive(btnAll);renderTable()});
+    btnNew.addEventListener('click',()=>{currentFilter="new";setActive(btnNew);renderTable()});
+    btnRead.addEventListener('click',()=>{currentFilter="read";setActive(btnRead);renderTable()});
+    function setActive(btn){[btnAll,btnNew,btnRead].forEach(b=>b.classList.remove('btn--primary'));btn.classList.add('btn--primary')}
 
-    function renderTable(rows){
-      const q = (searchInput.value || '').toLowerCase().trim();
-      const filtered = !q ? rows : rows.filter(r =>
-        (r.name+r.email+r.phone+r.message).toLowerCase().includes(q)
-      );
-
-      tbody.innerHTML = '';
-      if(filtered.length === 0){ emptyState.style.display='block'; return; }
-      emptyState.style.display='none';
-
-      for(const r of filtered){
-        const tr = document.createElement('tr');
-        // استخدام textContent (تجنّب إدخال HTML)
-        const d = r.date ? r.date.toLocaleString('ar-SA') : '';
-        tr.appendChild(td(r.name));
-        tr.appendChild(td(r.email));
-        tr.appendChild(td(r.phone));
-        tr.appendChild(td(r.message));
-        tr.appendChild(td(d));
-        tbody.appendChild(tr);
-      }
-    }
-
-    function td(text){
-      const cell = document.createElement('td');
-      cell.textContent = text ?? '';
-      return cell;
-    }
-
-    searchInput.addEventListener('input', ()=> renderTable(allRows));
-
-    /* ===== تصدير CSV ===== */
-    exportBtn.addEventListener('click', ()=>{
-      if(allRows.length === 0){ showToast('لا توجد بيانات للتصدير'); return; }
-      const header = ['الاسم','البريد','الجوال','الرسالة','التاريخ'];
-      const lines = [header.join(',')];
-      for(const r of allRows){
-        const row = [
-          safeCSV(r.name),
-          safeCSV(r.email),
-          safeCSV(r.phone),
-          safeCSV(r.message),
-          safeCSV(r.date ? r.date.toLocaleString('ar-SA') : '')
-        ].join(',');
-        lines.push(row);
-      }
-      const blob = new Blob(['\uFEFF'+lines.join('\n')], {type:'text/csv;charset=utf-8;'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'messages.csv';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
-
-    function safeCSV(value){
-      const v = (value ?? '').toString().replace(/"/g,'""');
-      return `"${v}"`;
-    }
+    exportBtn.addEventListener('click',()=>{let rows=[...allRows];if(currentFilter==="new")rows=rows.filter(r=>!r.read);if(currentFilter==="read")rows=rows.filter(r=>r.read);if(rows.length===0){showToast('لا توجد بيانات للتصدير');return}const header=['الاسم','البريد','الجوال','الرسالة','التاريخ','مقروء'];const lines=[header.join(',')];for(const r of rows){const row=[safeCSV(r.name),safeCSV(r.email),safeCSV(r.phone),safeCSV(r.message),safeCSV(r.date?r.date.toLocaleString('ar-SA'):''),safeCSV(r.read?'نعم':'لا')].join(',');lines.push(row)}const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='messages.csv';a.click();URL.revokeObjectURL(a.href)});
+    function safeCSV(v){const t=(v??'').toString().replace(/"/g,'""');return `"${t}"`}
   </script>
 </body>
 </html>

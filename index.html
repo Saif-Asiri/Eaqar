@@ -19,10 +19,14 @@
       --text:#0f172a;
       --muted:#667085;
       --shadow:0 10px 30px rgba(0,0,0,.15);
+
+      /* نافذة التفاصيل */
+      --overlay: rgba(2, 6, 23, .52);
+      --ring: rgba(31,139,203,.25);
     }
 
     *{box-sizing:border-box}
-    html{ scroll-behavior:smooth; } /* تمرير ناعم لزر ابدأ البحث */
+    html{ scroll-behavior:smooth; }
     body{
       margin:0;
       font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
@@ -100,7 +104,6 @@
       max-width:720px;
     }
 
-    /* زر يبدأ البحث -> ينقلك لأسفل إلى قسم العقارات */
     .cta{
       display:inline-flex; align-items:center; gap:10px;
       padding:14px 22px;
@@ -115,7 +118,7 @@
     .cta:hover{ transform: translateY(-2px); box-shadow: 0 16px 32px rgba(31,139,203,.45); filter:brightness(1.03); }
     .cta:active{ transform: translateY(0) scale(.98); }
 
-    /* ===== مربع التفاصيل (Stats) – نسخة متجاوبة بالكامل ===== */
+    /* ===== مربع التفاصيل (Stats) ===== */
     .stats{
       position:absolute; bottom:80px; left:50%; transform:translateX(-50%);
       display:flex; align-items:center; gap:18px;
@@ -137,7 +140,6 @@
     .stats .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); }
     .stats .dot.secondary{ background:var(--brand) }
 
-    /* — نسخة الهواتف: توسيع العرض، تحويلها إلى شبكية ثنائية — */
     @media (max-width: 560px){
       .stats{
         width: calc(100% - 28px);
@@ -210,6 +212,52 @@
     }
     .btn--primary:hover{ filter:brightness(1.05) }
 
+    /* ===== نافذة التفاصيل (Pop-up) ===== */
+    .modal{
+      position:fixed; inset:0; display:none;
+      align-items:center; justify-content:center;
+      background: var(--overlay);
+      z-index: 2000;
+    }
+    .modal.show{ display:flex; }
+    .modal-card{
+      width:min(900px, calc(100% - 24px));
+      background:#fff; border-radius:16px; box-shadow: var(--shadow);
+      overflow:hidden; animation: pop .22s ease both;
+    }
+    @keyframes pop{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+    .modal-head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px; border-bottom:1px solid #edf2f7; background: linear-gradient(180deg,#f7fbff,#ffffff);
+    }
+    .modal-title{ margin:0; font-weight:900; color:var(--brand-dark) }
+    .close-btn{
+      border:none; background:#f1f5f9; color:#0f172a; font-weight:800; cursor:pointer;
+      border-radius:8px; padding:6px 10px;
+    }
+    .close-btn:hover{ background:#e2e8f0 }
+    .modal-body{ display:grid; grid-template-columns: 1fr; gap:14px; padding:12px 16px 16px; }
+    @media(min-width:860px){ .modal-body{ grid-template-columns: .9fr 1.1fr; } }
+
+    .details-list{
+      border:1px solid #e6eef7; border-radius:12px; padding:12px; background:#fbfdff;
+      line-height:1.9;
+    }
+    .details-list b{ color:#0f172a }
+    .map-box{
+      border:1px solid #e6eef7; border-radius:12px; overflow:hidden; background:#eef5fb;
+      min-height:300px;
+    }
+    .map-box iframe{ width:100%; height:100%; display:block; border:0; }
+
+    .meta{
+      display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin-top:8px;
+    }
+    .meta .chip{
+      background:#f1f7fc; border:1px solid #d7e7f7; color:#0f2f4a; border-radius:10px;
+      padding:8px 10px; font-weight:800; text-align:center;
+    }
+
     /* ===== مساعدات ===== */
     .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);border:0}
   </style>
@@ -236,23 +284,19 @@
       <h1>اكتشف <span class="mark">بيت أحلامك</span> مع Eaqar</h1>
       <p>نقدّم لك مجموعة مختارة من الفلل والشقق والأراضي بأفضل الأسعار وخيارات تمويل تناسبك.</p>
 
-      <!-- زر ينقلك للأسفل إلى قسم العقارات -->
       <a class="cta" href="#properties">
         <span class="sr-only">الانتقال إلى قسم العقارات المميزة</span>
         ابدأ البحث الآن
       </a>
     </div>
 
-    <!-- مربع البيانات (متجاوب للهاتف) -->
     <div class="stats" aria-label="معلومات سريعة">
       <div class="item">
         <span class="dot secondary"></span>
         <b>+250</b>
         <span>عقار مميز</span>
       </div>
-
       <div class="sep"></div>
-
       <div class="item">
         <span class="dot"></span>
         <b>38</b>
@@ -267,6 +311,7 @@
     <p class="section-sub">اختر من بين أفضل العقارات المعروضة لدينا بمواقع استثنائية وتشطيبات عالية الجودة.</p>
 
     <div class="grid">
+      <!-- فيلا -->
       <article class="card">
         <img src="E2.jpg" alt="فيلا فاخرة بواجهة حديثة">
         <div class="content">
@@ -274,8 +319,19 @@
           <h3>فيلا فاخرة – حي الربيع</h3>
           <div class="price">2,500,000 ريال</div>
           <div class="actions">
-            <button class="btn">تفاصيل</button>
-            <!-- زر واتساب -->
+            <button
+              class="btn btn-details"
+              data-type="فيلا"
+              data-title="فيلا فاخرة – حي الربيع"
+              data-area="480 م²"
+              data-location="الرياض - حي الربيع"
+              data-bed="5"
+              data-bath="6"
+              data-lat="24.774265"
+              data-lng="46.738586"
+              data-notes="مدخلان + مجلس خارجي + موقفان سيارات">
+              تفاصيل
+            </button>
             <a class="btn btn--primary"
                href="#"
                data-type="فيلا"
@@ -286,6 +342,7 @@
         </div>
       </article>
 
+      <!-- شقة -->
       <article class="card">
         <img src="E1.jpeg" alt="شقة راقية حديثة">
         <div class="content">
@@ -293,7 +350,20 @@
           <h3>شقة راقية – وسط المدينة</h3>
           <div class="price">750,000 ريال</div>
           <div class="actions">
-            <button class="btn">تفاصيل</button>
+            <button
+              class="btn btn-details"
+              data-type="شقة"
+              data-title="شقة راقية – وسط المدينة"
+              data-area="140 م²"
+              data-location="الرياض - مركز المدينة"
+              data-floor="الطابق السابع"
+              data-bed="3"
+              data-bath="3"
+              data-lat="24.713551"
+              data-lng="46.675297"
+              data-notes="موقف سفلي خاص + قرب المترو 300م">
+              تفاصيل
+            </button>
             <a class="btn btn--primary"
                href="#"
                data-type="شقة"
@@ -304,6 +374,7 @@
         </div>
       </article>
 
+      <!-- أرض -->
       <article class="card">
         <img src="E3.jpg" alt="أرض استثمارية">
         <div class="content">
@@ -311,7 +382,18 @@
           <h3>أرض استثمارية – مخطط الحيلة الغربي</h3>
           <div class="price">1,200,000 ريال</div>
           <div class="actions">
-            <button class="btn">تفاصيل</button>
+            <button
+              class="btn btn-details"
+              data-type="أرض"
+              data-title="أرض استثمارية – مخطط الحيلة الغربي"
+              data-area="600 م²"
+              data-location="مخطط الحيلة الغربي"
+              data-bounds="شمالًا شارع 20م، جنوبًا جار، شرقًا ممر 10م، غربًا شارع 15م"
+              data-lat="18.216389"
+              data-lng="42.505278"
+              data-notes="مناسبة لمشروع شقق فندقية">
+              تفاصيل
+            </button>
             <a class="btn btn--primary"
                href="#"
                data-type="أرض استثمارية"
@@ -323,6 +405,32 @@
       </article>
     </div>
   </section>
+
+  <!-- نافذة التفاصيل (عامّة لكل البطاقات) -->
+  <div class="modal" id="detailsModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="modal-title" id="modalTitle">تفاصيل</h3>
+        <button class="close-btn" id="closeModal" aria-label="إغلاق النافذة">إغلاق ✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div>
+          <div class="details-list" id="detailsList">
+            <!-- يتم حقنه ديناميكياً -->
+          </div>
+
+          <div class="meta" id="metaChips">
+            <!-- شرائح سريعة (غرف/حمامات/المساحة/الطابق) -->
+          </div>
+        </div>
+
+        <div class="map-box">
+          <iframe id="mapFrame" title="خريطة الموقع" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- الفوتر (يتم تضمينه) -->
   <div w3-include-html="footer.html"></div>
@@ -344,7 +452,7 @@
     }
     includeHTML();
 
-    /* ضمان تشغيل الفيديو على الهواتف إن أمكن + fallback أنيق */
+    /* ضمان تشغيل الفيديو */
     (function ensureVideo(){
       const v=document.querySelector(".bg-video");
       if(!v) return;
@@ -354,25 +462,116 @@
       setTimeout(()=>{ if(v.paused){ document.getElementById("hero").classList.add("no-video"); }}, 1500);
     })();
 
-    /* ===== فتح واتساب برسالة مخصّصة =====
-       رقم الجوال: 0501424219 -> صيغة دولية للواتساب: 966501424219
-    */
+    /* ===== واتساب برسالة مخصّصة ===== */
     const WHATSAPP_NUMBER = "966501424219";
-
-    // تقبل عنصراً يحوي data-type و data-title
     function openWhatsApp(el){
       const type  = el.getAttribute('data-type')  || 'عقار';
       const title = el.getAttribute('data-title') || '';
       const msg = `أرغب في حجز زيارة إلى ${title} - نوع الحجز: ${type}`;
       const encoded = encodeURIComponent(msg);
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
-      window.open(url, "_blank", "noopener"); // فتح في تبويب جديد بأمان
-      return false; // منع التنقل للرابط #
+      window.open(url, "_blank", "noopener");
+      return false;
     }
+
+    /* ===== نافذة التفاصيل ===== */
+    const modal      = document.getElementById('detailsModal');
+    const closeModal = document.getElementById('closeModal');
+    const titleEl    = document.getElementById('modalTitle');
+    const detailsEl  = document.getElementById('detailsList');
+    const chipsEl    = document.getElementById('metaChips');
+    const mapFrame   = document.getElementById('mapFrame');
+
+    // فتح النافذة عند الضغط على أي زر تفاصيل
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.btn-details');
+      if(!btn) return;
+
+      const type     = btn.getAttribute('data-type')     || '';
+      const title    = btn.getAttribute('data-title')    || '';
+      const area     = btn.getAttribute('data-area')     || '';
+      const location = btn.getAttribute('data-location') || '';
+      const floor    = btn.getAttribute('data-floor')    || '';
+      const bed      = btn.getAttribute('data-bed')      || '';
+      const bath     = btn.getAttribute('data-bath')     || '';
+      const bounds   = btn.getAttribute('data-bounds')   || '';
+      const lat      = btn.getAttribute('data-lat');
+      const lng      = btn.getAttribute('data-lng');
+      const notes    = btn.getAttribute('data-notes')    || '';
+
+      // عنوان
+      titleEl.textContent = `${title} — تفاصيل ${type}`;
+
+      // تفاصيل نصية
+      const rows = [];
+      if(area)     rows.push(`<div><b>المساحة:</b> ${escapeHTML(area)}</div>`);
+      if(location) rows.push(`<div><b>الموقع:</b> ${escapeHTML(location)}</div>`);
+
+      if(type === 'شقة' && floor){
+        rows.push(`<div><b>الطابق:</b> ${escapeHTML(floor)}</div>`);
+      }
+      if(type !== 'أرض' && (bed || bath)){
+        if(bed)  rows.push(`<div><b>عدد الغرف:</b> ${escapeHTML(bed)}</div>`);
+        if(bath) rows.push(`<div><b>الحمامات:</b> ${escapeHTML(bath)}</div>`);
+      }
+      if(type === 'أرض' && bounds){
+        rows.push(`<div><b>الحدود والأطوال:</b> ${escapeHTML(bounds)}</div>`);
+      }
+      if(notes){
+        rows.push(`<div><b>ملاحظات:</b> ${escapeHTML(notes)}</div>`);
+      }
+      detailsEl.innerHTML = rows.join('');
+
+      // شرائح مختصرة
+      chipsEl.innerHTML = '';
+      if(area)    chipsEl.appendChild(makeChip(`المساحة: ${area}`));
+      if(bed)     chipsEl.appendChild(makeChip(`غرف: ${bed}`));
+      if(bath)    chipsEl.appendChild(makeChip(`حمامات: ${bath}`));
+      if(floor)   chipsEl.appendChild(makeChip(`${floor}`));
+
+      // خريطة
+      if(lat && lng){
+        const src = `https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lng)}&hl=ar&z=15&output=embed`;
+        mapFrame.src = src;
+      }else{
+        mapFrame.removeAttribute('src');
+      }
+
+      openModal();
+    });
+
+    function makeChip(text){
+      const d = document.createElement('div');
+      d.className = 'chip';
+      d.textContent = text;
+      return d;
+    }
+    function escapeHTML(v){
+      return (v??'').toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    function openModal(){
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden','false');
+      // قفل التمرير بالخلفية
+      document.documentElement.style.overflow='hidden';
+      closeModal.focus();
+    }
+    function hideModal(){
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden','true');
+      document.documentElement.style.overflow='';
+      // تنظيف الخريطة لتقليل الاستهلاك
+      mapFrame.removeAttribute('src');
+    }
+
+    closeModal.addEventListener('click', hideModal);
+    modal.addEventListener('click', (e)=>{ if(e.target===modal) hideModal(); });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && modal.classList.contains('show')) hideModal(); });
   </script>
 
   <style>
-    /* خلفية بديلة عند تعذر الفيديو – باستخدام الألوان الأساسية */
+    /* خلفية بديلة عند تعذر الفيديو */
     .no-video .overlay{
       background: linear-gradient(180deg, rgba(20,75,129,.85), rgba(20,75,129,.65) 40%, rgba(31,139,203,.55));
     }

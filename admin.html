@@ -9,32 +9,32 @@
 
   <style>
     :root{
-      --brand:#1f8bcb;
-      --brand-dark:#144b81;
-      --accent:#0fbf9f;
-      --surface:#ffffff;
-      --surface-2:#f4f7fb;
-      --text:#0f172a;
-      --muted:#667085;
-      --shadow:0 10px 30px rgba(0,0,0,.15);
-      --ring: rgba(31,139,203,.25);
-      --new-indicator:#63b3ed;
+      --brand:#1f8bcb; --brand-dark:#144b81; --accent:#0fbf9f;
+      --surface:#ffffff; --surface-2:#f4f7fb; --text:#0f172a; --muted:#667085;
+      --shadow:0 10px 30px rgba(0,0,0,.15); --ring: rgba(31,139,203,.25);
+      --new-indicator:#63b3ed; --danger:#dc2626;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;color:var(--text);background:var(--surface-2)}
 
+    /* Topbar */
     .topbar{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--brand-dark),#1f79b4);color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.16)}
     .topbar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
     .brand{display:flex;align-items:center;gap:10px;font-weight:900}
     .brand img{width:34px;height:34px;border-radius:8px;background:#fff;object-fit:contain}
+    .top-actions{display:flex;gap:8px;flex-wrap:wrap}
     .btn{padding:8px 14px;border-radius:999px;border:1px solid rgba(20,75,129,.18);background:#fff;color:var(--brand-dark);font-weight:800;cursor:pointer}
     .btn--primary{background:linear-gradient(135deg,var(--brand),#58b6e3);border:none;color:#062a46;box-shadow:0 10px 22px rgba(31,139,203,.3)}
+    .btn--ghost{background:#f1f5f9;border-color:#e2e8f0}
     .btn:disabled{opacity:.6;cursor:not-allowed}
+    .tab-active{outline:3px solid rgba(255,255,255,.35)}
 
     .wrap{max-width:1200px;margin:22px auto 40px;padding:0 16px}
     .card{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);border:1px solid rgba(20,75,129,.08)}
+    .section{display:none}
+    .section.show{display:block}
 
-    /* نموذج تسجيل الدخول */
+    /* Login */
     .login{max-width:520px;margin:64px auto;padding:22px}
     .login h2{margin:0 0 6px;text-align:center;color:var(--brand-dark)}
     .login p{text-align:center;color:var(--muted);margin:0 0 16px}
@@ -43,61 +43,72 @@
     .control:focus{border-color:var(--brand);box-shadow:0 0 0 4px var(--ring);background:#fff}
     .error{color:#dc2626;text-align:center;display:none;margin-top:6px}
 
-    .dashboard{padding:18px}
+    /* Grid */
     .grid{display:grid;gap:16px}
-    @media(min-width:900px){.grid{grid-template-columns:.45fr 1fr}}
+    @media(min-width:900px){.grid-2{grid-template-columns:.45fr 1fr}}
 
-    /* صندوق الإحصائيات (تصغير وتحسين المظهر) */
+    /* Stats */
     .stats{padding:12px;display:grid;gap:10px}
     .stat{border:1px dashed rgba(20,75,129,.18);border-radius:12px;padding:10px;display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,rgba(20,75,129,.04),rgba(31,139,203,.05));color:#123354;font-weight:700;font-size:.9rem}
     .stat .chip{min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:#fff;border:1px solid rgba(31,139,203,.25);font-size:.9rem}
 
+    /* Toolbar */
     .toolbar{padding:12px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(20,75,129,.08)}
     .search{display:flex;align-items:center;gap:10px;background:#f9fbfe;border:1px solid #d4dbe7;border-radius:12px;padding:6px 10px;min-width:260px}
     .search input{border:none;outline:none;background:transparent;width:180px}
     .filter-buttons{display:flex;gap:8px;flex-wrap:wrap}
-
     .badge{display:none;min-width:18px;padding:2px 6px;border-radius:999px;font-size:.8rem;font-weight:700;background:var(--brand);color:#fff;margin-inline-start:4px}
 
+    /* Table */
     .table-wrap{overflow:auto}
     table{width:100%;border-collapse:collapse}
     th,td{padding:10px;border-bottom:1px solid #eef2f7;text-align:right;font-size:.9rem}
     th{position:sticky;top:0;color:#fff;background:var(--brand-dark)}
     tr:hover td{background:#f9fbfe}
-    .empty{padding:20px;text-align:center;color:var(--muted)}
+    .empty{padding:20px;text-align:center;color:#888}
 
     .new-indicator{width:10px;height:10px;border-radius:50%;background:var(--new-indicator);display:inline-block;margin-inline-end:6px}
-
-    /* زر الحذف */
-    .delete-btn{
-      background:#e2e8f0;
-      color:#444;
-      border:none;
-      border-radius:6px;
-      padding:4px 8px;
-      font-size:.8rem;
-      cursor:pointer;
-      transition:background .2s ease,color .2s ease;
-    }
-    .delete-btn:hover{
-      background:#dc2626;
-      color:#fff;
-    }
+    .delete-btn{background:#e2e8f0;color:#444;border:none;border-radius:6px;padding:4px 8px;font-size:.8rem;cursor:pointer;transition:background .2s,color .2s}
+    .delete-btn:hover{background:#dc2626;color:#fff}
 
     .toast{position:fixed;inset-inline-start:16px;bottom:16px;z-index:50;background:#0fddbd;color:#05343a;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);display:none;font-weight:800}
     .toast.show{display:block;animation:pop .4s ease both}
     @keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+    /* تبويب العقارات */
+    .form-grid{display:grid;gap:12px}
+    @media(min-width:900px){.form-grid{grid-template-columns:1fr 1fr}}
+    .fg{display:flex;flex-direction:column;gap:6px}
+    .label{font-weight:800;color:#113354}
+    .hint{color:#667085;font-size:.85rem}
+    .row-1{grid-column:1/-1}
+    .switch{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .switch label{display:flex;align-items:center;gap:8px}
+    .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+    .thumbs img{width:64px;height:64px;border-radius:10px;object-fit:cover;border:1px solid #e5e9f2}
+    .actions-row{display:flex;gap:8px;flex-wrap:wrap}
+    .danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+    .ghost{background:#f8fafc;border:1px solid #e2e8f0}
+    .filters{display:flex;gap:8px;flex-wrap:wrap}
+    .chipbtn{padding:6px 10px;border-radius:999px;border:1px solid #dbe3ef;background:#fff;cursor:pointer}
+    .chipbtn.active{background:#eaf4ff;border-color:#98c9f5;color:#0f2740;font-weight:800}
+    .nowrap{white-space:nowrap}
+    .hide{display:none}
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand"><img src="logo.png" alt="شعار Eaqar"><div>لوحة إدارة Eaqar</div></div>
-      <div class="top-actions"><button id="btnSignOut" class="btn" style="display:none;">تسجيل الخروج</button></div>
+      <div class="top-actions">
+        <button id="tabMessages" class="btn btn--ghost tab-active">الرسائل</button>
+        <button id="tabProps" class="btn btn--ghost">تفاصيل العقارات</button>
+        <button id="btnSignOut" class="btn" style="display:none;">تسجيل الخروج</button>
+      </div>
     </div>
   </header>
 
-  <!-- نموذج تسجيل الدخول -->
+  <!-- تسجيل الدخول -->
   <section id="loginSection" class="card login">
     <h2>تسجيل دخول المشرف</h2>
     <p>سجّل الدخول ببريد المشرف للوصول إلى الرسائل</p>
@@ -107,13 +118,15 @@
     <div id="loginError" class="error">فشل تسجيل الدخول، تأكد من البيانات.</div>
   </section>
 
-  <main id="dashboardSection" class="wrap" style="display:none;">
-    <div class="grid">
+  <!-- الرسائل -->
+  <main id="messagesSection" class="wrap section show">
+    <div class="grid grid-2">
       <aside class="card stats">
         <div class="stat"><span class="chip">📨</span><div>إجمالي الرسائل<br><b id="statTotal">0</b></div></div>
         <div class="stat"><span class="chip">🆕</span><div>الرسائل الجديدة<br><b id="statNew">0</b></div></div>
         <div class="stat"><span class="chip">✅</span><div>المقروءة<br><b id="statRead">0</b></div></div>
       </aside>
+
       <section class="card">
         <div class="toolbar">
           <div class="search"><span>🔍</span><input id="searchInput" type="search" placeholder="ابحث…"></div>
@@ -125,11 +138,81 @@
           </div>
         </div>
         <div class="table-wrap">
-          <table>
+          <table aria-label="قائمة الرسائل">
             <thead><tr><th></th><th>الاسم</th><th>البريد</th><th>الجوال</th><th>الرسالة</th><th>التاريخ</th><th>إجراء</th></tr></thead>
             <tbody id="tbody"></tbody>
           </table>
           <div id="emptyState" class="empty" style="display:none;">لا توجد بيانات</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- تفاصيل العقارات -->
+  <main id="propsSection" class="wrap section">
+    <div class="grid grid-2">
+      <!-- نموذج -->
+      <section class="card" style="padding:16px">
+        <h3 style="margin:0 0 6px;color:#144b81">إضافة / تعديل عقار</h3>
+        <p class="hint" style="margin:0 0 14px">املأ الحقول ثم احفظ. يظهر في الصفحات حسب “مميز” و“ظاهر”.</p>
+
+        <div class="form-grid">
+          <div class="fg"><label class="label">العنوان</label><input id="p_title" class="control" placeholder="مثال: فيلا فاخرة – حي الربيع"></div>
+          <div class="fg"><label class="label">النوع</label>
+            <select id="p_type" class="control">
+              <option value="فيلا">فيلا</option><option value="شقة">شقة</option><option value="أرض">أرض</option>
+            </select>
+          </div>
+          <div class="fg"><label class="label">السعر (ريال)</label><input id="p_price" type="number" class="control" placeholder="2500000"></div>
+          <div class="fg"><label class="label">المساحة</label><input id="p_area" class="control" placeholder="480 م²"></div>
+          <div class="fg row-1"><label class="label">الموقع (وصف)</label><input id="p_loc" class="control" placeholder="الرياض - حي الربيع"></div>
+          <div class="fg"><label class="label">Latitude</label><input id="p_lat" class="control" inputmode="decimal" placeholder="24.77"></div>
+          <div class="fg"><label class="label">Longitude</label><input id="p_lng" class="control" inputmode="decimal" placeholder="46.73"></div>
+
+          <div class="fg" id="grp_floor"><label class="label">الطابق (للشقة)</label><input id="p_floor" class="control" placeholder="الطابق السابع"></div>
+          <div class="fg" id="grp_rooms"><label class="label">عدد الغرف</label><input id="p_rooms" type="number" class="control" placeholder="5"></div>
+          <div class="fg" id="grp_baths"><label class="label">عدد الحمامات</label><input id="p_baths" type="number" class="control" placeholder="6"></div>
+          <div class="fg row-1" id="grp_bounds"><label class="label">حدود/أطوال (للأرض)</label><textarea id="p_bounds" class="control" rows="3" placeholder="شمالًا شارع 20م ..."></textarea></div>
+
+          <div class="fg row-1">
+            <label class="label">صور العقار (يمكن اختيار عدة صور)</label>
+            <input id="p_images" type="file" class="control" accept="image/*" multiple>
+            <div id="p_thumbs" class="thumbs"></div>
+          </div>
+
+          <div class="row-1 switch">
+            <label><input id="p_featured" type="checkbox"> مميز (يظهر في الرئيسية)</label>
+            <label><input id="p_active" type="checkbox" checked> ظاهر في صفحة جميع العقارات</label>
+          </div>
+
+          <div class="row-1 actions-row">
+            <button id="btnSave" class="btn btn--primary">حفظ العقار</button>
+            <button id="btnReset" class="btn ghost" type="button">تفريغ النموذج</button>
+            <button id="btnDeleteProp" class="btn danger" type="button" style="display:none">حذف هذا العقار</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- قائمة العقارات -->
+      <section class="card">
+        <div class="toolbar">
+          <div class="search"><span>🔍</span><input id="p_search" type="search" placeholder="ابحث عنوان/نوع/موقع…"></div>
+          <div class="filters">
+            <button class="chipbtn active" data-type="all">الكل</button>
+            <button class="chipbtn" data-type="فيلا">فيلا</button>
+            <button class="chipbtn" data-type="شقة">شقة</button>
+            <button class="chipbtn" data-type="أرض">أرض</button>
+            <span class="nowrap"><input type="checkbox" id="flt_featured"> فقط المميزة</span>
+            <span class="nowrap"><input type="checkbox" id="flt_active" checked> فقط الظاهرة</span>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table aria-label="قائمة العقارات">
+            <thead><tr><th>العنوان</th><th>النوع</th><th>السعر</th><th>مميز</th><th>ظاهر</th><th>تحكم</th></tr></thead>
+            <tbody id="p_tbody"></tbody>
+          </table>
+          <div id="p_empty" class="empty" style="display:none;">لا توجد بيانات</div>
         </div>
       </section>
     </div>
@@ -140,65 +223,88 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
     const firebaseConfig={apiKey:"AIzaSyCDjLeMPjw6k5KaoHmD64AoBccr70w1FjY",authDomain:"eaqar-contact.firebaseapp.com",projectId:"eaqar-contact",storageBucket:"eaqar-contact.firebasestorage.app",messagingSenderId:"547232219651",appId:"1:547232219651:web:89b9d5476da967fe3e8436"};
-    const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
+    const app=initializeApp(firebaseConfig); const auth=getAuth(app); const db=getFirestore(app); const storage=getStorage(app);
 
-    const loginSection=document.getElementById('loginSection');
-    const dashboard=document.getElementById('dashboardSection');
-    const loginBtn=document.getElementById('btnLogin');
-    const signOutBtn=document.getElementById('btnSignOut');
-    const loginError=document.getElementById('loginError');
-    const tbody=document.getElementById('tbody');
-    const emptyState=document.getElementById('emptyState');
-    const statTotal=document.getElementById('statTotal');
-    const statNew=document.getElementById('statNew');
-    const statRead=document.getElementById('statRead');
-    const searchInput=document.getElementById('searchInput');
-    const exportBtn=document.getElementById('btnExport');
+    /* تبويب */
+    const tabMessages=document.getElementById('tabMessages'), tabProps=document.getElementById('tabProps');
+    const messagesSection=document.getElementById('messagesSection'), propsSection=document.getElementById('propsSection');
+    tabMessages.addEventListener('click',()=>{tabMessages.classList.add('tab-active');tabProps.classList.remove('tab-active');messagesSection.classList.add('show');propsSection.classList.remove('show')});
+    tabProps.addEventListener('click',()=>{tabProps.classList.add('tab-active');tabMessages.classList.remove('tab-active');propsSection.classList.add('show');messagesSection.classList.remove('show')});
+
+    /* دخول/خروج */
+    const loginSection=document.getElementById('loginSection'), loginBtn=document.getElementById('btnLogin');
+    const signOutBtn=document.getElementById('btnSignOut'), loginError=document.getElementById('loginError');
     const toast=document.getElementById('toast');
-    const btnAll=document.getElementById('btnAll');
-    const btnNew=document.getElementById('btnNew');
-    const btnRead=document.getElementById('btnRead');
-    const badgeNew=document.getElementById('badgeNew');
+    function showToast(m){toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2500)}
+    onAuthStateChanged(auth,(u)=>{if(u){loginSection.style.display='none';signOutBtn.style.display='inline-block';attachRealtimeMessages();attachRealtimeProperties();}else{messagesSection.classList.remove('show');propsSection.classList.remove('show');signOutBtn.style.display='none';loginSection.style.display='block';}});
+    loginBtn.addEventListener('click',async()=>{loginError.style.display='none';const email=document.getElementById('email').value.trim();const pass=document.getElementById('password').value.trim();if(!email||!pass){loginError.textContent='أدخل البريد وكلمة المرور';loginError.style.display='block';return}try{await signInWithEmailAndPassword(auth,email,pass);showToast('تم تسجيل الدخول ✅')}catch{loginError.textContent='بيانات الدخول غير صحيحة';loginError.style.display='block'}});
+    signOutBtn.addEventListener('click',async()=>{await signOut(auth);showToast('تم تسجيل الخروج')});
 
-    let allRows=[];let currentFilter="all";
+    /* ===== الرسائل (كما كانت) ===== */
+    const tbody=document.getElementById('tbody'), emptyState=document.getElementById('emptyState');
+    const statTotal=document.getElementById('statTotal'), statNew=document.getElementById('statNew'), statRead=document.getElementById('statRead');
+    const searchInput=document.getElementById('searchInput'), btnAll=document.getElementById('btnAll'), btnNew=document.getElementById('btnNew'), btnRead=document.getElementById('btnRead'), badgeNew=document.getElementById('badgeNew'), exportBtn=document.getElementById('btnExport');
+    let allRows=[], currentFilter="all";
+    function attachRealtimeMessages(){const q=query(collection(db,'messages'),orderBy('createdAt','desc'));onSnapshot(q,(snap)=>{allRows=[];snap.forEach(d=>{const v=d.data();allRows.push({id:d.id,name:v.name||'',email:v.email||'',phone:v.phone||'',message:v.message||'',read:v.read===true,date:v.createdAt?.toDate?v.createdAt.toDate():null});});updateMsgStats();renderMsgTable();},()=>showToast('تعذر تحميل الرسائل'))}
+    function updateMsgStats(){const t=allRows.length,n=allRows.filter(r=>!r.read).length;statTotal.textContent=t;statNew.textContent=n;statRead.textContent=t-n;badgeNew.style.display=n>0?'inline-block':'none';badgeNew.textContent=n}
+    function renderMsgTable(){let rows=[...allRows];if(currentFilter==="new")rows=rows.filter(r=>!r.read);if(currentFilter==="read")rows=rows.filter(r=>r.read);const q=(searchInput.value||'').toLowerCase().trim();if(q)rows=rows.filter(r=>(r.name+r.email+r.phone+r.message).toLowerCase().includes(q));tbody.innerHTML='';if(rows.length===0){emptyState.style.display='block';return}emptyState.style.display='none';for(const r of rows){const tr=document.createElement('tr');tr.addEventListener('click',()=>markAsRead(r));const ind=document.createElement('td');if(!r.read){const dot=document.createElement('span');dot.className='new-indicator';ind.appendChild(dot)}tr.appendChild(ind);tr.appendChild(td(r.name));tr.appendChild(td(r.email));tr.appendChild(td(r.phone));tr.appendChild(td(r.message));tr.appendChild(td(r.date? r.date.toLocaleString('ar-SA'):'' ));const act=document.createElement('td');const del=document.createElement('button');del.textContent='حذف';del.className='delete-btn';del.addEventListener('click',(e)=>{e.stopPropagation();deleteMessage(r)});act.appendChild(del);tr.appendChild(act);tbody.appendChild(tr);}}
+    function td(t){const c=document.createElement('td');c.textContent=t||'';return c}
+    async function markAsRead(r){if(r.read)return;try{await updateDoc(doc(db,'messages',r.id),{read:true});}catch(e){}}
+    async function deleteMessage(r){if(!confirm("هل تريد حذف هذه الرسالة؟"))return;try{await deleteDoc(doc(db,'messages',r.id));showToast('تم حذف الرسالة');}catch{showToast('فشل حذف الرسالة')}}
+    searchInput.addEventListener('input',renderMsgTable);
+    btnAll.addEventListener('click',()=>{currentFilter="all";setActive(btnAll);renderMsgTable()});
+    btnNew.addEventListener('click',()=>{currentFilter="new";setActive(btnNew);renderMsgTable()});
+    btnRead.addEventListener('click',()=>{currentFilter="read";setActive(btnRead);renderMsgTable()});
+    function setActive(b){[btnAll,btnNew,btnRead].forEach(x=>x.classList.remove('btn--primary'));b.classList.add('btn--primary')}
+    exportBtn.addEventListener('click',()=>{let rows=[...allRows];if(currentFilter==="new")rows=rows.filter(r=>!r.read);if(currentFilter==="read")rows=rows.filter(r=>r.read);if(rows.length===0){showToast('لا توجد بيانات للتصدير');return}const header=['الاسم','البريد','الجوال','الرسالة','التاريخ','مقروء'],lines=[header.join(',')];for(const r of rows){lines.push([csv(r.name),csv(r.email),csv(r.phone),csv(r.message),csv(r.date? r.date.toLocaleString('ar-SA'):''),csv(r.read?'نعم':'لا')].join(','));}const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='messages.csv';a.click();URL.revokeObjectURL(a.href)});function csv(v){return `"${(v??'').toString().replace(/"/g,'""')}"`}
 
-    function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2500)}
+    /* ===== العقارات ===== */
+    const p_title=document.getElementById('p_title'), p_type=document.getElementById('p_type'), p_price=document.getElementById('p_price'), p_area=document.getElementById('p_area'), p_loc=document.getElementById('p_loc'), p_lat=document.getElementById('p_lat'), p_lng=document.getElementById('p_lng'), p_floor=document.getElementById('p_floor'), p_rooms=document.getElementById('p_rooms'), p_baths=document.getElementById('p_baths'), p_bounds=document.getElementById('p_bounds'), p_images=document.getElementById('p_images'), p_thumbs=document.getElementById('p_thumbs'), p_featured=document.getElementById('p_featured'), p_active=document.getElementById('p_active'), btnSave=document.getElementById('btnSave'), btnReset=document.getElementById('btnReset'), btnDeleteProp=document.getElementById('btnDeleteProp');
+    const grp_floor=document.getElementById('grp_floor'), grp_rooms=document.getElementById('grp_rooms'), grp_baths=document.getElementById('grp_baths'), grp_bounds=document.getElementById('grp_bounds');
+    const p_tbody=document.getElementById('p_tbody'), p_empty=document.getElementById('p_empty'), p_search=document.getElementById('p_search'), fltFeatured=document.getElementById('flt_featured'), fltActive=document.getElementById('flt_active'), chipBtns=[...document.querySelectorAll('.chipbtn')];
 
-    onAuthStateChanged(auth,(user)=>{if(user){loginSection.style.display='none';dashboard.style.display='block';signOutBtn.style.display='inline-block';attachRealtime();}else{dashboard.style.display='none';signOutBtn.style.display='none';loginSection.style.display='block';}});
+    let propsAll=[], editId=null, typeFilter='all';
 
-    loginBtn.addEventListener('click',async()=>{loginError.style.display='none';const email=document.getElementById('email').value.trim();const pass=document.getElementById('password').value.trim();if(!email||!pass){loginError.textContent='أدخل البريد وكلمة المرور';loginError.style.display='block';return}try{await signInWithEmailAndPassword(auth,email,pass);showToast('تم تسجيل الدخول ✅')}catch{loginError.textContent='بيانات الدخول غير صحيحة';loginError.style.display='block';}});
+    function refreshTypeGroups(){const t=p_type.value;if(t==='أرض'){grp_floor.classList.add('hide');grp_rooms.classList.add('hide');grp_baths.classList.add('hide');grp_bounds.classList.remove('hide')}else if(t==='شقة'){grp_floor.classList.remove('hide');grp_rooms.classList.remove('hide');grp_baths.classList.remove('hide');grp_bounds.classList.add('hide')}else{grp_floor.classList.add('hide');grp_rooms.classList.remove('hide');grp_baths.classList.remove('hide');grp_bounds.classList.add('hide')}}
+    refreshTypeGroups(); p_type.addEventListener('change',refreshTypeGroups);
 
-    signOutBtn.addEventListener('click',async()=>{await signOut(auth);showToast('تم تسجيل الخروج');tbody.innerHTML='';statTotal.textContent='0'});
+    p_images.addEventListener('change',()=>{p_thumbs.innerHTML='';[...p_images.files].forEach(f=>{const img=document.createElement('img');img.src=URL.createObjectURL(f);p_thumbs.appendChild(img)})});
 
-    function attachRealtime(){const q=query(collection(db,'messages'),orderBy('createdAt','desc'));onSnapshot(q,(snap)=>{allRows=[];snap.forEach(docSnap=>{const d=docSnap.data();allRows.push({id:docSnap.id,name:d.name||'',email:d.email||'',phone:d.phone||'',message:d.message||'',read:d.read===true,date:d.createdAt?.toDate?d.createdAt.toDate():null});});updateStats();renderTable();},()=>showToast('تعذر تحميل البيانات'))}
+    async function uploadSelectedImages(propId){const files=[...p_images.files];if(files.length===0)return[];const urls=[];for(const f of files){const path=`properties/${propId}/${Date.now()}_${Math.random().toString(36).slice(2)}_${f.name}`;const r=ref(storage,path);await uploadBytes(r,f);urls.push(await getDownloadURL(r))}return urls}
 
-    function updateStats(){
-      const total=allRows.length;
-      const newCount=allRows.filter(r=>!r.read).length;
-      const readCount=total-newCount;
-      statTotal.textContent=total;
-      statNew.textContent=newCount;
-      statRead.textContent=readCount;
-      if(newCount>0){badgeNew.style.display='inline-block';badgeNew.textContent=newCount;}else{badgeNew.style.display='none';}
-    }
+    btnSave.addEventListener('click',async()=>{const title=(p_title.value||'').trim();if(!title){showToast('أدخل العنوان');p_title.focus();return}
+      const data={title,type:p_type.value,price:(p_price.value||'').trim(),area:(p_area.value||'').trim(),location:(p_loc.value||'').trim(),lat:parseFloat(p_lat.value)||null,lng:parseFloat(p_lng.value)||null,floor:(p_type.value==='شقة'?(p_floor.value||'').trim():null),rooms:(p_type.value!=='أرض'?(parseInt(p_rooms.value)||null):null),baths:(p_type.value!=='أرض'?(parseInt(p_baths.value)||null):null),bounds:(p_type.value==='أرض'?(p_bounds.value||'').trim():null),featured:!!p_featured.checked,active:!!p_active.checked,createdAt:serverTimestamp()};
+      try{
+        if(editId){
+          await updateDoc(doc(db,'properties',editId),data);
+          const more=await uploadSelectedImages(editId);
+          if(more.length){const snap=await getDoc(doc(db,'properties',editId));const old=(snap.data()?.images)||[];await updateDoc(doc(db,'properties',editId),{images:[...old,...more]})}
+          showToast('تم تحديث العقار');
+        }else{
+          const refDoc=await addDoc(collection(db,'properties'),{...data,images:[]});
+          const urls=await uploadSelectedImages(refDoc.id); if(urls.length){await updateDoc(refDoc,{images:urls})}
+          showToast('تم إضافة العقار');
+        }
+        resetForm();
+      }catch(e){console.error(e);showToast('تعذر الحفظ')}
+    });
 
-    function renderTable(){let rows=[...allRows];if(currentFilter==="new")rows=rows.filter(r=>!r.read);if(currentFilter==="read")rows=rows.filter(r=>r.read);const q=searchInput.value.toLowerCase().trim();if(q)rows=rows.filter(r=>(r.name+r.email+r.phone+r.message).toLowerCase().includes(q));tbody.innerHTML='';if(rows.length===0){emptyState.style.display='block';return}emptyState.style.display='none';for(const r of rows){const tr=document.createElement('tr');tr.addEventListener('click',()=>markAsRead(r));const indicatorCell=document.createElement('td');if(!r.read){const dot=document.createElement('span');dot.className='new-indicator';indicatorCell.appendChild(dot);}tr.appendChild(indicatorCell);tr.appendChild(td(r.name));tr.appendChild(td(r.email));tr.appendChild(td(r.phone));tr.appendChild(td(r.message));tr.appendChild(td(r.date?r.date.toLocaleString('ar-SA'):''));const actionCell=document.createElement('td');const delBtn=document.createElement('button');delBtn.textContent="حذف";delBtn.className="delete-btn";delBtn.addEventListener('click',(e)=>{e.stopPropagation();deleteMessage(r)});actionCell.appendChild(delBtn);tr.appendChild(actionCell);tbody.appendChild(tr);}}function td(text){const cell=document.createElement('td');cell.textContent=text||'';return cell}
+    btnReset.addEventListener('click',resetForm);
+    function resetForm(){editId=null;p_title.value='';p_type.value='فيلا';p_price.value='';p_area.value='';p_loc.value='';p_lat.value='';p_lng.value='';p_floor.value='';p_rooms.value='';p_baths.value='';p_bounds.value='';p_featured.checked=false;p_active.checked=true;p_images.value='';p_thumbs.innerHTML='';btnDeleteProp.style.display='none';refreshTypeGroups()}
 
-    async function markAsRead(r){if(r.read)return;try{await updateDoc(doc(db,'messages',r.id),{read:true});}catch(e){console.error(e)}}
+    btnDeleteProp.addEventListener('click',async()=>{if(!editId)return;if(!confirm('هل تريد حذف هذا العقار (سيتم حذف صوره)؟'))return;try{const snap=await getDoc(doc(db,'properties',editId));const imgs=(snap.data()?.images)||[];for(const u of imgs){try{await deleteObject(ref(storage,u))}catch{}}await deleteDoc(doc(db,'properties',editId));showToast('تم حذف العقار');resetForm()}catch(e){console.error(e);showToast('فشل حذف العقار')}});
 
-    async function deleteMessage(r){if(!confirm("هل تريد حذف هذه الرسالة؟"))return;try{await deleteDoc(doc(db,'messages',r.id));showToast('تم حذف الرسالة');}catch(e){console.error(e);showToast('فشل حذف الرسالة');}}
+    function attachRealtimeProperties(){const q=query(collection(db,'properties'),orderBy('createdAt','desc'));onSnapshot(q,(snap)=>{propsAll=[];snap.forEach(d=>{const v=d.data();propsAll.push({id:d.id,title:v.title||'',type:v.type||'',price:v.price||'',area:v.area||'',location:v.location||'',lat:v.lat||null,lng:v.lng||null,floor:v.floor||null,rooms:v.rooms||null,baths:v.baths||null,bounds:v.bounds||null,featured:!!v.featured,active:!!v.active,images:Array.isArray(v.images)?v.images:[],createdAt:v.createdAt?.toDate?v.createdAt.toDate():null});});renderProps()},()=>showToast('تعذر تحميل العقارات'))}
 
-    searchInput.addEventListener('input',renderTable);
-    btnAll.addEventListener('click',()=>{currentFilter="all";setActive(btnAll);renderTable()});
-    btnNew.addEventListener('click',()=>{currentFilter="new";setActive(btnNew);renderTable()});
-    btnRead.addEventListener('click',()=>{currentFilter="read";setActive(btnRead);renderTable()});
-    function setActive(btn){[btnAll,btnNew,btnRead].forEach(b=>b.classList.remove('btn--primary'));btn.classList.add('btn--primary')}
-
-    exportBtn.addEventListener('click',()=>{let rows=[...allRows];if(currentFilter==="new")rows=rows.filter(r=>!r.read);if(currentFilter==="read")rows=rows.filter(r=>r.read);if(rows.length===0){showToast('لا توجد بيانات للتصدير');return}const header=['الاسم','البريد','الجوال','الرسالة','التاريخ','مقروء'];const lines=[header.join(',')];for(const r of rows){const row=[safeCSV(r.name),safeCSV(r.email),safeCSV(r.phone),safeCSV(r.message),safeCSV(r.date?r.date.toLocaleString('ar-SA'):''),safeCSV(r.read?'نعم':'لا')].join(',');lines.push(row)}const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='messages.csv';a.click();URL.revokeObjectURL(a.href)});
-    function safeCSV(v){const t=(v??'').toString().replace(/"/g,'""');return `"${t}"`}
+    function renderProps(){const q=(p_search.value||'').toLowerCase().trim();let rows=propsAll.filter(r=>{if(typeFilter!=='all'&&r.type!==typeFilter)return false;if(fltFeatured.checked&&!r.featured)return false;if(fltActive.checked&&!r.active)return false;return (r.title+r.type+r.location).toLowerCase().includes(q)});p_tbody.innerHTML='';if(rows.length===0){p_empty.style.display='block';return}p_empty.style.display='none';for(const r of rows){const tr=document.createElement('tr');tr.appendChild(td(r.title));tr.appendChild(td(r.type));tr.appendChild(td(r.price||''));tr.appendChild(toggleCell(r,'featured','مميز'));tr.appendChild(toggleCell(r,'active','ظاهر'));const act=document.createElement('td');const e=document.createElement('button');e.className='btn';e.textContent='تعديل';e.addEventListener('click',()=>fillForm(r));const d=document.createElement('button');d.className='btn danger';d.textContent='حذف';d.addEventListener('click',()=>deleteProperty(r));act.appendChild(e);act.appendChild(document.createTextNode(' '));act.appendChild(d);tr.appendChild(act);p_tbody.appendChild(tr)}}
+    function toggleCell(r,field,label){const td=document.createElement('td');const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!r[field];cb.addEventListener('change',async()=>{try{await updateDoc(doc(db,'properties',r.id),{[field]:cb.checked});showToast(cb.checked?`تم تفعيل ${label}`:`تم إلغاء ${label}`)}catch(e){cb.checked=!cb.checked;showToast('فشل التحديث')}});td.appendChild(cb);return td}
+    function fillForm(r){editId=r.id;p_title.value=r.title;p_type.value=r.type;p_price.value=r.price;p_area.value=r.area;p_loc.value=r.location;p_lat.value=r.lat??'';p_lng.value=r.lng??'';p_floor.value=r.floor??'';p_rooms.value=r.rooms??'';p_baths.value=r.baths??'';p_bounds.value=r.bounds??'';p_featured.checked=r.featured;p_active.checked=r.active;p_thumbs.innerHTML='';r.images.forEach(u=>{const i=document.createElement('img');i.src=u;p_thumbs.appendChild(i)});btnDeleteProp.style.display='inline-block';refreshTypeGroups();propsSection.scrollIntoView({behavior:'smooth'})}
+    async function deleteProperty(r){if(!confirm('حذف هذا العقار مع صوره؟'))return;try{for(const u of (r.images||[])){try{await deleteObject(ref(storage,u))}catch{}}await deleteDoc(doc(db,'properties',r.id));showToast('تم حذف العقار');if(editId===r.id)resetForm()}catch(e){showToast('فشل حذف العقار')}}
+    p_search.addEventListener('input',renderProps);fltFeatured.addEventListener('change',renderProps);fltActive.addEventListener('change',renderProps);chipBtns.forEach(b=>b.addEventListener('click',()=>{chipBtns.forEach(x=>x.classList.remove('active'));b.classList.add('active');typeFilter=b.dataset.type;renderProps()}));
   </script>
 </body>
 </html>

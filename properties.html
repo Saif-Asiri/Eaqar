@@ -8,121 +8,399 @@
   <meta name="color-scheme" content="light only"/>
 
   <style>
-    :root{--brand:#1f8bcb;--brand-dark:#144b81;--accent:#0fbf9f;--surface:#fff;--surface-2:#f4f7fb;--text:#0f172a;--muted:#667085;--shadow:0 10px 30px rgba(0,0,0,.15)}
-    *{box-sizing:border-box} body{margin:0;font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;background:var(--surface-2);color:var(--text)}
-    .wrap{max-width:1200px;margin:24px auto 60px;padding:0 16px}
-    h1{margin:0 0 10px;color:var(--brand-dark)} .sub{color:var(--muted);margin:0 0 18px}
-    .grid{display:grid;grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));gap:22px}
-    .card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);border:1px solid rgba(20,75,129,.08)}
-    .card img{width:100%;height:200px;object-fit:cover}
-    .content{padding:14px 16px 16px;text-align:right}
-    .badge{display:inline-block;background: rgba(31,139,203,.08);color: var(--brand-dark);border: 1px solid rgba(31,139,203,.22);padding:4px 10px;border-radius:999px;font-size:.78rem;margin-bottom:8px}
-    .price{color:var(--accent);font-weight:900}
-    .actions{display:flex;gap:10px;margin-top:10px}
-    .btn{flex:1;text-align:center;padding:10px 12px;border-radius:10px;text-decoration:none;border:1px solid rgba(20,75,129,.18);background:#fff;cursor:pointer;font-weight:800}
-    .btn--primary{background:#144b81;color:#fff;border-color:transparent}
-    /* modal */
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background: rgba(2,6,23,.52);z-index:2000}
-    .modal.show{display:flex}
-    .modal-card{width:min(900px, calc(100% - 24px));background:#fff;border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
-    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #edf2f7;background: linear-gradient(180deg,#f7fbff,#ffffff)}
-    .modal-title{margin:0;font-weight:900;color:#144b81}
-    .close-btn{border:none;background:#f1f5f9;color:#0f172a;font-weight:800;cursor:pointer;border-radius:8px;padding:6px 10px}
-    .modal-body{display:grid;grid-template-columns:1fr;gap:14px;padding:12px 16px 16px}
-    @media(min-width:860px){.modal-body{grid-template-columns:.9fr 1.1fr}}
-    .details-list{border:1px solid #e6eef7;border-radius:12px;padding:12px;background:#fbfdff;line-height:1.9}
-    .meta{display:grid;grid-template-columns: repeat(2, minmax(0,1fr));gap:10px;margin-top:8px}
-    .meta .chip{background:#f1f7fc;border:1px solid #d7e7f7;color:#0f2f4a;border-radius:10px;padding:8px 10px;font-weight:800;text-align:center}
-    .map-box{border:1px solid #e6eef7;border-radius:12px;overflow:hidden;background:#eef5fb;min-height:300px}
-    .map-box iframe{width:100%;height:100%;border:0;display:block}
+    :root{
+      --brand:#1f8bcb; --brand-dark:#144b81; --accent:#0fbf9f;
+      --surface:#fff; --surface-2:#f4f7fb; --text:#0f172a; --muted:#667085;
+      --shadow:0 10px 30px rgba(0,0,0,.15); --ring: rgba(31,139,203,.25);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+      background:var(--surface-2); color:var(--text);
+      display:flex; flex-direction:column; min-height:100vh;
+    }
+    main{flex:1}
+
+    /* رأس الصفحة */
+    .header-sec{ text-align:center; margin:24px auto 16px }
+    .header-sec h1{ margin:0 0 8px; color:var(--brand-dark); font-size:2rem }
+    .header-sec p{ color:var(--muted); margin:0; font-size:1rem }
+
+    /* الفلاتر */
+    .filters{
+      max-width:1200px; margin:0 auto 24px; padding:0 16px;
+      display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+    }
+    .filters .control{
+      padding:10px 12px; border-radius:10px; border:1px solid #d4dbe7;
+      background:#fff; min-width:150px; font-size:.95rem
+    }
+    .filters button{
+      background:var(--brand-dark); color:#fff; font-weight:800;
+      border:none; border-radius:10px; padding:10px 16px; cursor:pointer
+    }
+    .filters button:hover{ filter:brightness(1.05) }
+    @media (max-width:600px){
+      .filters{ flex-direction:column; align-items:stretch }
+      .filters .control,.filters button{ width:100% }
+    }
+
+    /* شبكة البطاقات */
+    .wrap{ max-width:1200px; margin:0 auto 60px; padding:0 16px }
+    .grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:22px }
+    .card{
+      background:#fff; border-radius:16px; overflow:hidden;
+      box-shadow:var(--shadow); border:1px solid rgba(20,75,129,.08);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover{ transform: translateY(-4px); box-shadow:0 16px 36px rgba(0,0,0,.18) }
+    .img-wrap{ width:100%; aspect-ratio:16/9; background:#eef3f8 }
+    .img-wrap img{ width:100%; height:100%; object-fit:cover; display:block }
+    .content{ padding:14px 16px 16px; text-align:right }
+    .badge{
+      display:inline-block; background: rgba(31,139,203,.08); color: var(--brand-dark);
+      border: 1px solid rgba(31,139,203,.22); padding:4px 10px; border-radius:999px;
+      font-size:.78rem; margin-bottom:8px
+    }
+    .card h3{ margin:6px 0 6px; font-size:1.1rem; color:#0f172a }
+    .price{ color:var(--accent); font-weight:900 }
+    .muted{ color:#667085; font-size:.92rem }
+    .actions{ display:flex; gap:10px; margin-top:10px }
+    .btn{
+      flex:1; text-align:center; padding:10px 12px; border-radius:10px; text-decoration:none;
+      border:1px solid rgba(20,75,129,.18); background:#fff; cursor:pointer; font-weight:800
+    }
+    .btn--primary{ background:var(--brand-dark); color:#fff; border-color:transparent }
+    .empty{ padding:24px; text-align:center; color:#7a8699 }
+
+    /* المودال (نفس ستايل index) */
+    .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(2,6,23,.52); z-index:2000 }
+    .modal.show{ display:flex }
+    .modal-card{
+      width:min(900px, calc(100% - 24px)); background:#fff; border-radius:16px; box-shadow:var(--shadow);
+      overflow:hidden; animation: pop .22s ease both;
+    }
+    @keyframes pop{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+    .modal-head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px; border-bottom:1px solid #edf2f7; background: linear-gradient(180deg,#f7fbff,#ffffff);
+    }
+    .modal-title{ margin:0; font-weight:900; color:var(--brand-dark) }
+    .close-btn{
+      border:none; background:#f1f5f9; color:#0f172a; font-weight:800; cursor:pointer;
+      border-radius:8px; padding:6px 10px;
+    }
+    .close-btn:hover{ background:#e2e8f0 }
+    .modal-body{ display:grid; grid-template-columns:1fr; gap:14px; padding:12px 16px 16px }
+    @media(min-width:860px){ .modal-body{ grid-template-columns: .9fr 1.1fr } }
+
+    .details-list{
+      border:1px solid #e6eef7; border-radius:12px; padding:12px; background:#fbfdff; line-height:1.9;
+      color:#0f172a; /* يضمن وضوح النص */
+    }
+    .details-list b{ color:#0f172a }
+    .meta{
+      display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin-top:8px;
+    }
+    .meta .chip{
+      background:#f1f7fc; border:1px solid #d7e7f7; color:#0f2f4a; border-radius:10px;
+      padding:8px 10px; font-weight:800; text-align:center;
+    }
+
+    .more-details{
+      margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;
+    }
+    .more-details .tag{
+      background:#eef6ff; border:1px solid #cfe2ff; color:#0f2740;
+      padding:6px 10px; border-radius:10px; font-weight:800; font-size:.9rem;
+    }
+
+    .map-box{
+      border:1px solid #e6eef7; border-radius:12px; overflow:hidden; background:#eef5fb;
+      min-height:300px;
+    }
+    .map-box iframe{ width:100%; height:100%; display:block; border:0 }
   </style>
 </head>
 <body>
+  <!-- الهيدر -->
   <div w3-include-html="header.html"></div>
 
-  <div class="wrap">
-    <h1>كل العقارات</h1>
-    <p class="sub">تظهر هنا العقارات المفعّلة (حتى لو لم تكن مميزة). لعرض المميزة فقط، اذهب للصفحة الرئيسية.</p>
-    <div id="grid" class="grid"></div>
-  </div>
+  <main>
+    <div class="header-sec">
+      <h1>كل العقارات</h1>
+      <p>من الأراضي للمباني، تجد هنا كل ما تبحث عنه لتستثمر في مستقبلك أو تجد مكانك المثالي.</p>
+    </div>
 
-  <!-- Modal -->
+    <div class="filters">
+      <select id="fltType" class="control" aria-label="تصفية حسب النوع">
+        <option value="all">الكل</option>
+        <option value="فيلا">فيلا</option>
+        <option value="شقة">شقة</option>
+        <option value="أرض">أرض</option>
+      </select>
+      <input id="fltQuery" type="search" class="control" placeholder="ابحث بالعنوان أو الموقع" aria-label="بحث">
+      <button id="btnSearch">بحث</button>
+    </div>
+
+    <div class="wrap">
+      <div id="grid" class="grid"></div>
+      <div id="emptyState" class="empty" style="display:none;">لا توجد نتائج مطابقة.</div>
+    </div>
+  </main>
+
+  <!-- مودال التفاصيل -->
   <div class="modal" id="detailsModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
     <div class="modal-card">
       <div class="modal-head">
         <h3 class="modal-title" id="modalTitle">تفاصيل</h3>
-        <button class="close-btn" id="closeModal">إغلاق ✕</button>
+        <button class="close-btn" id="closeModal" aria-label="إغلاق النافذة">إغلاق ✕</button>
       </div>
       <div class="modal-body">
         <div>
           <div class="details-list" id="detailsList"></div>
           <div class="meta" id="metaChips"></div>
+          <div class="more-details" id="moreDetails"></div>
         </div>
-        <div class="map-box"><iframe id="mapFrame" title="خريطة الموقع" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+        <div class="map-box">
+          <iframe id="mapFrame" title="خريطة الموقع" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- الفوتر -->
   <div w3-include-html="footer.html"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+    /* ===== Firebase ===== */
     const firebaseConfig={apiKey:"AIzaSyCDjLeMPjw6k5KaoHmD64AoBccr70w1FjY",authDomain:"eaqar-contact.firebaseapp.com",projectId:"eaqar-contact",storageBucket:"eaqar-contact.firebasestorage.app",messagingSenderId:"547232219651",appId:"1:547232219651:web:89b9d5476da967fe3e8436"};
-    const app=initializeApp(firebaseConfig); const db=getFirestore(app);
+    const app=initializeApp(firebaseConfig);
+    const db=getFirestore(app);
 
-    function includeHTML(){document.querySelectorAll("[w3-include-html]").forEach(async el=>{const f=el.getAttribute("w3-include-html"); if(!f) return; try{const r=await fetch(f); el.innerHTML=await r.text(); el.removeAttribute("w3-include-html"); includeHTML();}catch(e){}})}; includeHTML();
+    /* ===== تضمين الهيدر/الفوتر ===== */
+    function includeHTML(){
+      document.querySelectorAll("[w3-include-html]").forEach(async el=>{
+        const file=el.getAttribute("w3-include-html"); if(!file) return;
+        try{
+          const r=await fetch(file);
+          el.innerHTML=await r.text();
+          el.removeAttribute("w3-include-html");
+          includeHTML();
+        }catch(e){ console.warn("Include failed:", file, e); }
+      });
+    }
+    includeHTML();
 
-    const grid=document.getElementById('grid'); const WHATSAPP_NUMBER="966501424219";
-    function openWhatsApp(type,title){const m=`أرغب في حجز زيارة إلى ${title} - نوع الحجز: ${type}`; window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(m)}`,"_blank","noopener")}
+    /* ===== واتساب ===== */
+    const WHATSAPP_NUMBER="966501424219";
+    function openWhatsApp(el){
+      const type  = el.getAttribute('data-type')  || 'عقار';
+      const title = el.getAttribute('data-title') || '';
+      const msg   = `أرغب في حجز زيارة إلى ${title} - نوع الحجز: ${type}`;
+      const url   = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank", "noopener");
+      return false;
+    }
+    window.openWhatsApp = openWhatsApp;
 
-    function card(p){const el=document.createElement('article'); el.className='card'; el.innerHTML=`
-      <img src="${esc(p.img||'logo.png')}" alt="${esc(p.title)}">
-      <div class="content">
-        <span class="badge">${esc(p.type||'عقار')}</span>
-        <h3>${esc(p.title)}</h3>
-        ${p.price? `<div class="price">${esc(p.price)}</div>`:''}
-        <div class="actions">
-          <button class="btn" data-role="details"
-            data-type="${esc(p.type||'')}" data-title="${esc(p.title||'')}"
-            data-area="${esc(p.area||'')}" data-location="${esc(p.location||'')}"
-            data-floor="${esc(p.floor||'')}" data-bed="${esc(p.bed||'')}" data-bath="${esc(p.bath||'')}"
-            data-bounds="${esc(p.bounds||'')}" data-lat="${p.lat??''}" data-lng="${p.lng??''}">تفاصيل</button>
-          <button class="btn btn--primary" data-role="wa" data-type="${esc(p.type||'')}" data-title="${esc(p.title||'')}">احجز زيارة</button>
-        </div>
-      </div>`; return el;}
+    /* ===== DOM ===== */
+    const grid=document.getElementById('grid');
+    const emptyState=document.getElementById('emptyState');
+    const fltType=document.getElementById('fltType');
+    const fltQuery=document.getElementById('fltQuery');
 
-    // جلب كل العقارات ثم ترشيح active=true على الواجهة
+    /* ===== Helpers ===== */
+    const clean = v => (v===undefined||v===null)? '' : (''+v).trim();
+    function esc(v){ return clean(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+    /* ===== بطاقة عقار ===== */
+    function card(p){
+      const cover = p.coverUrl || (Array.isArray(p.images) && p.images[0]) || 'logo.png';
+      const el=document.createElement('article'); el.className='card';
+      // نُسجّل التفاصيل الإضافية كسلسلة JSON في data-details
+      const detailsJson = encodeURIComponent(JSON.stringify(p.details||[]));
+      el.innerHTML = `
+        <div class="img-wrap"><img src="${esc(cover)}" alt="${esc(p.title||'عقار')}"></div>
+        <div class="content">
+          <span class="badge">${esc(p.type||'عقار')}</span>
+          <h3>${esc(p.title||'')}</h3>
+          ${p.price? `<div class="price">${esc(p.price)}</div>`:''}
+          ${p.location? `<div class="muted">${esc(p.location)}</div>`:''}
+          <div class="actions">
+            <button
+              class="btn btn-details"
+              data-type="${esc(p.type||'')}"
+              data-title="${esc(p.title||'')}"
+              data-area="${esc(p.area||'')}"
+              data-location="${esc(p.location||'')}"
+              data-floor="${esc(p.floor||'')}"
+              data-bed="${p.rooms??''}"
+              data-bath="${p.baths??''}"
+              data-bounds="${esc(p.bounds||'')}"
+              data-lat="${p.lat??''}"
+              data-lng="${p.lng??''}"
+              data-notes="${esc(p.notes||'')}"
+              data-details="${detailsJson}"
+            >تفاصيل</button>
+
+            <a class="btn btn--primary"
+               href="#"
+               data-type="${esc(p.type||'')}"
+               data-title="${esc(p.title||'')}"
+               onclick="return openWhatsApp(this)"
+               aria-label="حجز زيارة لـ ${esc(p.title||'')} عبر واتساب">احجز زيارة</a>
+          </div>
+        </div>`;
+      return el;
+    }
+
+    /* ===== جلب البيانات ===== */
+    let ALL=[];
     const qAll=query(collection(db,'properties'), orderBy('createdAt','desc'));
     onSnapshot(qAll,(snap)=>{
-      grid.innerHTML='';
-      let count=0;
+      ALL=[];
       snap.forEach(d=>{
-        const v=d.data(); if(!v.active) return; count++;
-        grid.appendChild(card({
-          type:v.type,title:v.title,price:v.price,area:v.area,location:v.location,floor:v.floor,bed:v.rooms,bath:v.baths,bounds:v.bounds,lat:v.lat,lng:v.lng,img:(Array.isArray(v.images)&&v.images[0])||'logo.png'
-        }));
+        const v=d.data();
+        if(!v.active) return;
+        ALL.push({
+          id:d.id,
+          title: clean(v.title),
+          type: clean(v.type),
+          price: clean(v.price),
+          area: clean(v.area),
+          location: clean(v.location),
+          lat: v.lat??null,
+          lng: v.lng??null,
+          floor: clean(v.floor),
+          rooms: (v.rooms??''),
+          baths: (v.baths??''),
+          bounds: clean(v.bounds),
+          notes: clean(v.notes),
+          images: Array.isArray(v.images)? v.images: [],
+          coverUrl: v.coverUrl||null,
+          details: Array.isArray(v.details)? v.details.map(clean).filter(Boolean): [], // <-- جديد
+          featured: !!v.featured, active: !!v.active,
+        });
       });
-      if(count===0){ // نسخة احتياطية: العناصر الثلاثة القديمة
-        legacy().forEach(p=>grid.appendChild(card(p)));
+      render();
+    },()=>{ grid.innerHTML=''; emptyState.style.display='block'; });
+
+    function render(){
+      grid.innerHTML='';
+      const type = fltType.value;
+      const q = clean(fltQuery.value).toLowerCase();
+
+      const rows = ALL.filter(r=>{
+        if(type!=='all' && r.type!==type) return false;
+        if(q){
+          const hay = (r.title+' '+r.location).toLowerCase();
+          if(!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      if(!rows.length){ emptyState.style.display='block'; return; }
+      emptyState.style.display='none';
+      rows.forEach(r=> grid.appendChild(card(r)));
+    }
+
+    document.getElementById('btnSearch').addEventListener('click', render);
+    fltType.addEventListener('change', render);
+    fltQuery.addEventListener('keydown', (e)=>{ if(e.key==='Enter') render() });
+
+    /* ===== مودال التفاصيل ===== */
+    const modal      = document.getElementById('detailsModal');
+    const closeModal = document.getElementById('closeModal');
+    const titleEl    = document.getElementById('modalTitle');
+    const detailsEl  = document.getElementById('detailsList');
+    const chipsEl    = document.getElementById('metaChips');
+    const moreDetails= document.getElementById('moreDetails');
+    const mapFrame   = document.getElementById('mapFrame');
+
+    document.addEventListener('click',(e)=>{
+      const btn = e.target.closest('.btn-details');
+      if(!btn) return;
+
+      const type     = clean(btn.getAttribute('data-type'));
+      const title    = clean(btn.getAttribute('data-title'));
+      const area     = clean(btn.getAttribute('data-area'));
+      const location = clean(btn.getAttribute('data-location'));
+      const floor    = clean(btn.getAttribute('data-floor'));
+      const bed      = clean(btn.getAttribute('data-bed'));
+      const bath     = clean(btn.getAttribute('data-bath'));
+      const bounds   = clean(btn.getAttribute('data-bounds'));
+      const lat      = btn.getAttribute('data-lat');
+      const lng      = btn.getAttribute('data-lng');
+      const notes    = clean(btn.getAttribute('data-notes'));
+      let more       = [];
+      try{ more = JSON.parse(decodeURIComponent(btn.getAttribute('data-details')||'%5B%5D')); }
+      catch{ more = []; }
+
+      titleEl.textContent = `${title} — تفاصيل ${type}`;
+
+      // تفاصيل نصية العلوية
+      const rows = [];
+      if(area)     rows.push(`<div><b>المساحة:</b> ${esc(area)}</div>`);
+      if(location) rows.push(`<div><b>الموقع:</b> ${esc(location)}</div>`);
+      if(type === 'شقة' && floor){ rows.push(`<div><b>الطابق:</b> ${esc(floor)}</div>`); }
+      if(type !== 'أرض'){
+        if(bed)  rows.push(`<div><b>عدد الغرف:</b> ${esc(bed)}</div>`);
+        if(bath) rows.push(`<div><b>الحمامات:</b> ${esc(bath)}</div>`);
       }
+      if(type === 'أرض' && bounds){ rows.push(`<div><b>الحدود والأطوال:</b> ${esc(bounds)}</div>`); }
+      if(notes){ rows.push(`<div><b>ملاحظات:</b> ${esc(notes)}</div>`); }
+      detailsEl.innerHTML = rows.join('') || '<div>لا توجد تفاصيل إضافية.</div>';
+
+      // الشرائح السريعة
+      chipsEl.innerHTML = '';
+      if(area)  chipsEl.appendChild(chip(`المساحة: ${area}`));
+      if(bed)   chipsEl.appendChild(chip(`غرف: ${bed}`));
+      if(bath)  chipsEl.appendChild(chip(`حمامات: ${bath}`));
+      if(floor) chipsEl.appendChild(chip(`${floor}`));
+
+      // تفاصيل إضافية (من لوحة المشرف)
+      moreDetails.innerHTML = '';
+      (more||[]).filter(Boolean).forEach(t=>{
+        const tag=document.createElement('div'); tag.className='tag'; tag.textContent=t;
+        moreDetails.appendChild(tag);
+      });
+
+      // الخريطة
+      if(lat && lng){
+        mapFrame.src = `https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lng)}&hl=ar&z=15&output=embed`;
+      }else{
+        mapFrame.removeAttribute('src');
+      }
+
+      openModal();
     });
 
-    function legacy(){return [
-      {type:'فيلا', title:'فيلا فاخرة – حي الربيع', price:'2,500,000 ريال', area:'480 م²', location:'الرياض - حي الربيع', bed:'5', bath:'6', lat:24.774265, lng:46.738586, img:'E2.jpg'},
-      {type:'شقة', title:'شقة راقية – وسط المدينة', price:'750,000 ريال', area:'140 م²', location:'الرياض - مركز المدينة', bed:'3', bath:'3', floor:'الطابق السابع', lat:24.713551, lng:46.675297, img:'E1.jpeg'},
-      {type:'أرض', title:'أرض استثمارية – مخطط الحيلة الغربي', price:'1,200,000 ريال', area:'600 م²', location:'مخطط الحيلة الغربي', bounds:'شمالًا شارع 20م، جنوبًا جار، شرقًا ممر 10م، غربًا شارع 15م', lat:18.216389, lng:42.505278, img:'E3.jpg'}
-    ]}
+    function chip(text){
+      const d = document.createElement('div');
+      d.className = 'chip';
+      d.textContent = text;
+      return d;
+    }
 
-    // تفاصيل
-    const modal=document.getElementById('detailsModal'); const closeModal=document.getElementById('closeModal'); const detailsEl=document.getElementById('detailsList'); const chipsEl=document.getElementById('metaChips'); const titleEl=document.getElementById('modalTitle'); const mapFrame=document.getElementById('mapFrame');
-    document.addEventListener('click',(e)=>{const wa=e.target.closest('[data-role="wa"]'); if(wa){openWhatsApp(wa.dataset.type,wa.dataset.title);return}const b=e.target.closest('[data-role="details"]'); if(!b)return;const type=b.dataset.type||'',title=b.dataset.title||'',area=b.dataset.area||'',loc=b.dataset.location||'',floor=b.dataset.floor||'',bed=b.dataset.bed||'',bath=b.dataset.bath||'',bounds=b.dataset.bounds||'',lat=b.dataset.lat,lng=b.dataset.lng;titleEl.textContent=`${title} — تفاصيل ${type}`;const rows=[];if(area)rows.push(`<div><b>المساحة:</b> ${esc(area)}</div>`);if(loc)rows.push(`<div><b>الموقع:</b> ${esc(loc)}</div>`);if(type==='شقة'&&floor)rows.push(`<div><b>الطابق:</b> ${esc(floor)}</div>`);if(type!=='أرض'){if(bed)rows.push(`<div><b>عدد الغرف:</b> ${esc(bed)}</div>`);if(bath)rows.push(`<div><b>الحمامات:</b> ${esc(bath)}</div>`)}if(type==='أرض'&&bounds)rows.push(`<div><b>الحدود والأطوال:</b> ${esc(bounds)}</div>`);detailsEl.innerHTML=rows.join('');chipsEl.innerHTML='';if(area)chip(`المساحة: ${area}`);if(bed)chip(`غرف: ${bed}`);if(bath)chip(`حمامات: ${bath}`);if(floor)chip(floor);if(lat&&lng){mapFrame.src=`https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lng)}&hl=ar&z=15&output=embed`}else mapFrame.removeAttribute('src');openModal()});
-    function chip(t){const d=document.createElement('div');d.className='chip';d.textContent=t;chipsEl.appendChild(d)}
-    function openModal(){modal.classList.add('show');document.documentElement.style.overflow='hidden'}
-    function hideModal(){modal.classList.remove('show');document.documentElement.style.overflow='';mapFrame.removeAttribute('src')}
-    closeModal.addEventListener('click',hideModal); modal.addEventListener('click',(e)=>{if(e.target===modal)hideModal()}); document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&modal.classList.contains('show'))hideModal()});
-    function esc(v){return (v??'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+    function openModal(){
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden','false');
+      document.documentElement.style.overflow='hidden';
+      closeModal.focus();
+    }
+    function hideModal(){
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden','true');
+      document.documentElement.style.overflow='';
+      mapFrame.removeAttribute('src');
+    }
+    closeModal.addEventListener('click', hideModal);
+    modal.addEventListener('click', (e)=>{ if(e.target===modal) hideModal(); });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && modal.classList.contains('show')) hideModal(); });
   </script>
 </body>
 </html>

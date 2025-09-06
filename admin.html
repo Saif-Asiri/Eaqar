@@ -84,8 +84,29 @@
     .row-1{grid-column:1/-1}
     .switch{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .switch label{display:flex;align-items:center;gap:8px}
+
+    /* صور العقار */
     .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-    .thumbs img{width:64px;height:64px;border-radius:10px;object-fit:cover;border:1px solid #e5e9f2}
+    .thumb{
+      position:relative;width:76px;height:76px;border-radius:12px;overflow:hidden;
+      border:1px solid #e5e9f2;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)
+    }
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .thumb .btn-x{
+      position:absolute;top:6px;inset-inline-start:6px;width:22px;height:22px;border-radius:999px;
+      border:none;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;font-weight:900;line-height:22px;
+    }
+    .thumb .cover-dot{
+      position:absolute;inset-inline-end:6px;bottom:6px;width:22px;height:22px;border-radius:999px;
+      background:#fff;border:2px solid #cbd5e1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      font-size:14px;user-select:none
+    }
+    .thumb.cover .cover-dot{background:#1f8bcb;border-color:#1f8bcb;color:#fff}
+    .thumb::after{ /* إطار مرئي عند كونها الغلاف */
+      content:"";position:absolute;inset:0;border:3px solid transparent;border-radius:12px;pointer-events:none
+    }
+    .thumb.cover::after{border-color:#1f8bcb}
+
     .actions-row{display:flex;gap:8px;flex-wrap:wrap}
     .danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
     .ghost{background:#f8fafc;border:1px solid #e2e8f0}
@@ -101,8 +122,9 @@
     <div class="topbar-inner">
       <div class="brand"><img src="logo.png" alt="شعار Eaqar"><div>لوحة إدارة Eaqar</div></div>
       <div class="top-actions">
-        <button id="tabMessages" class="btn btn--ghost tab-active">الرسائل</button>
-        <button id="tabProps" class="btn btn--ghost">تفاصيل العقارات</button>
+        <!-- إخفاء الأزرار المحمية حتى تسجيل الدخول -->
+        <button id="tabMessages" class="btn btn--ghost" style="display:none;">الرسائل</button>
+        <button id="tabProps" class="btn btn--ghost" style="display:none;">تفاصيل العقارات</button>
         <button id="btnSignOut" class="btn" style="display:none;">تسجيل الخروج</button>
       </div>
     </div>
@@ -119,7 +141,7 @@
   </section>
 
   <!-- الرسائل -->
-  <main id="messagesSection" class="wrap section show">
+  <main id="messagesSection" class="wrap section">
     <div class="grid grid-2">
       <aside class="card stats">
         <div class="stat"><span class="chip">📨</span><div>إجمالي الرسائل<br><b id="statTotal">0</b></div></div>
@@ -154,7 +176,7 @@
       <!-- نموذج -->
       <section class="card" style="padding:16px">
         <h3 style="margin:0 0 6px;color:#144b81">إضافة / تعديل عقار</h3>
-        <p class="hint" style="margin:0 0 14px">املأ الحقول ثم احفظ. يظهر في الصفحات حسب “مميز” و“ظاهر”.</p>
+        <p class="hint" style="margin:0 0 14px">اختر الصور وحدد الغلاف بالنقطة الدائرية. حذف الصورة يتم بزر X.</p>
 
         <div class="form-grid">
           <div class="fg"><label class="label">العنوان</label><input id="p_title" class="control" placeholder="مثال: فيلا فاخرة – حي الربيع"></div>
@@ -177,7 +199,8 @@
           <div class="fg row-1">
             <label class="label">صور العقار (يمكن اختيار عدة صور)</label>
             <input id="p_images" type="file" class="control" accept="image/*" multiple>
-            <div id="p_thumbs" class="thumbs"></div>
+            <!-- المعاينة المحسّنة -->
+            <div id="p_thumbs" class="thumbs" aria-live="polite"></div>
           </div>
 
           <div class="row-1 switch">
@@ -226,32 +249,101 @@
     import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
+    // ===== Firebase (بيئة عامة) =====
     const firebaseConfig={apiKey:"AIzaSyCDjLeMPjw6k5KaoHmD64AoBccr70w1FjY",authDomain:"eaqar-contact.firebaseapp.com",projectId:"eaqar-contact",storageBucket:"eaqar-contact.firebasestorage.app",messagingSenderId:"547232219651",appId:"1:547232219651:web:89b9d5476da967fe3e8436"};
     const app=initializeApp(firebaseConfig); const auth=getAuth(app); const db=getFirestore(app); const storage=getStorage(app);
 
-    /* تبويب */
+    // ===== تبويب =====
     const tabMessages=document.getElementById('tabMessages'), tabProps=document.getElementById('tabProps');
     const messagesSection=document.getElementById('messagesSection'), propsSection=document.getElementById('propsSection');
     tabMessages.addEventListener('click',()=>{tabMessages.classList.add('tab-active');tabProps.classList.remove('tab-active');messagesSection.classList.add('show');propsSection.classList.remove('show')});
     tabProps.addEventListener('click',()=>{tabProps.classList.add('tab-active');tabMessages.classList.remove('tab-active');propsSection.classList.add('show');messagesSection.classList.remove('show')});
 
-    /* دخول/خروج */
+    // ===== دخول/خروج =====
     const loginSection=document.getElementById('loginSection'), loginBtn=document.getElementById('btnLogin');
     const signOutBtn=document.getElementById('btnSignOut'), loginError=document.getElementById('loginError');
     const toast=document.getElementById('toast');
-    function showToast(m){toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2500)}
-    onAuthStateChanged(auth,(u)=>{if(u){loginSection.style.display='none';signOutBtn.style.display='inline-block';attachRealtimeMessages();attachRealtimeProperties();}else{messagesSection.classList.remove('show');propsSection.classList.remove('show');signOutBtn.style.display='none';loginSection.style.display='block';}});
-    loginBtn.addEventListener('click',async()=>{loginError.style.display='none';const email=document.getElementById('email').value.trim();const pass=document.getElementById('password').value.trim();if(!email||!pass){loginError.textContent='أدخل البريد وكلمة المرور';loginError.style.display='block';return}try{await signInWithEmailAndPassword(auth,email,pass);showToast('تم تسجيل الدخول ✅')}catch{loginError.textContent='بيانات الدخول غير صحيحة';loginError.style.display='block'}});
+    function showToast(m){toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2200)}
+
+    onAuthStateChanged(auth,(u)=>{
+      if(u){
+        // إخفاء نموذج الدخول، وإظهار الأزرار والأقسام المحمية
+        loginSection.style.display='none';
+        tabMessages.style.display='inline-block';
+        tabProps.style.display='inline-block';
+        signOutBtn.style.display='inline-block';
+
+        // افتح تبويب الرسائل افتراضيًا بعد تسجيل الدخول
+        tabMessages.classList.add('tab-active');
+        tabProps.classList.remove('tab-active');
+        messagesSection.classList.add('show');
+        propsSection.classList.remove('show');
+
+        attachRealtimeMessages();
+        attachRealtimeProperties();
+      } else {
+        // عند تسجيل الخروج: إخفاء الأزرار والأقسام المحمية وإظهار نموذج الدخول
+        tabMessages.style.display='none';
+        tabProps.style.display='none';
+        signOutBtn.style.display='none';
+        tabMessages.classList.remove('tab-active');
+        tabProps.classList.remove('tab-active');
+        messagesSection.classList.remove('show');
+        propsSection.classList.remove('show');
+        loginSection.style.display='block';
+      }
+    });
+
+    loginBtn.addEventListener('click',async()=>{
+      loginError.style.display='none';
+      const email=document.getElementById('email').value.trim();
+      const pass=document.getElementById('password').value.trim();
+      if(!email||!pass){loginError.textContent='أدخل البريد وكلمة المرور';loginError.style.display='block';return}
+      try{await signInWithEmailAndPassword(auth,email,pass);showToast('تم تسجيل الدخول ✅')}
+      catch{loginError.textContent='بيانات الدخول غير صحيحة';loginError.style.display='block'}
+    });
     signOutBtn.addEventListener('click',async()=>{await signOut(auth);showToast('تم تسجيل الخروج')});
 
-    /* ===== الرسائل (كما كانت) ===== */
+    // ===== الرسائل =====
     const tbody=document.getElementById('tbody'), emptyState=document.getElementById('emptyState');
     const statTotal=document.getElementById('statTotal'), statNew=document.getElementById('statNew'), statRead=document.getElementById('statRead');
     const searchInput=document.getElementById('searchInput'), btnAll=document.getElementById('btnAll'), btnNew=document.getElementById('btnNew'), btnRead=document.getElementById('btnRead'), badgeNew=document.getElementById('badgeNew'), exportBtn=document.getElementById('btnExport');
     let allRows=[], currentFilter="all";
-    function attachRealtimeMessages(){const q=query(collection(db,'messages'),orderBy('createdAt','desc'));onSnapshot(q,(snap)=>{allRows=[];snap.forEach(d=>{const v=d.data();allRows.push({id:d.id,name:v.name||'',email:v.email||'',phone:v.phone||'',message:v.message||'',read:v.read===true,date:v.createdAt?.toDate?v.createdAt.toDate():null});});updateMsgStats();renderMsgTable();},()=>showToast('تعذر تحميل الرسائل'))}
+
+    function attachRealtimeMessages(){
+      const q=query(collection(db,'messages'),orderBy('createdAt','desc'));
+      onSnapshot(q,(snap)=>{
+        allRows=[];
+        snap.forEach(d=>{
+          const v=d.data();
+          allRows.push({
+            id:d.id,name:v.name||'',email:v.email||'',phone:v.phone||'',message:v.message||'',
+            read:v.read===true,date:v.createdAt?.toDate?v.createdAt.toDate():null
+          });
+        });
+        updateMsgStats();renderMsgTable();
+      },()=>showToast('تعذر تحميل الرسائل'));
+    }
     function updateMsgStats(){const t=allRows.length,n=allRows.filter(r=>!r.read).length;statTotal.textContent=t;statNew.textContent=n;statRead.textContent=t-n;badgeNew.style.display=n>0?'inline-block':'none';badgeNew.textContent=n}
-    function renderMsgTable(){let rows=[...allRows];if(currentFilter==="new")rows=rows.filter(r=>!r.read);if(currentFilter==="read")rows=rows.filter(r=>r.read);const q=(searchInput.value||'').toLowerCase().trim();if(q)rows=rows.filter(r=>(r.name+r.email+r.phone+r.message).toLowerCase().includes(q));tbody.innerHTML='';if(rows.length===0){emptyState.style.display='block';return}emptyState.style.display='none';for(const r of rows){const tr=document.createElement('tr');tr.addEventListener('click',()=>markAsRead(r));const ind=document.createElement('td');if(!r.read){const dot=document.createElement('span');dot.className='new-indicator';ind.appendChild(dot)}tr.appendChild(ind);tr.appendChild(td(r.name));tr.appendChild(td(r.email));tr.appendChild(td(r.phone));tr.appendChild(td(r.message));tr.appendChild(td(r.date? r.date.toLocaleString('ar-SA'):'' ));const act=document.createElement('td');const del=document.createElement('button');del.textContent='حذف';del.className='delete-btn';del.addEventListener('click',(e)=>{e.stopPropagation();deleteMessage(r)});act.appendChild(del);tr.appendChild(act);tbody.appendChild(tr);}}
+    function renderMsgTable(){
+      let rows=[...allRows];
+      if(currentFilter==="new")rows=rows.filter(r=>!r.read);
+      if(currentFilter==="read")rows=rows.filter(r=>r.read);
+      const q=(searchInput.value||'').toLowerCase().trim();
+      if(q)rows=rows.filter(r=>(r.name+r.email+r.phone+r.message).toLowerCase().includes(q));
+      tbody.innerHTML='';
+      if(rows.length===0){emptyState.style.display='block';return}
+      emptyState.style.display='none';
+      for(const r of rows){
+        const tr=document.createElement('tr');tr.addEventListener('click',()=>markAsRead(r));
+        const ind=document.createElement('td');if(!r.read){const dot=document.createElement('span');dot.className='new-indicator';ind.appendChild(dot)}tr.appendChild(ind);
+        tr.appendChild(td(r.name));tr.appendChild(td(r.email));tr.appendChild(td(r.phone));tr.appendChild(td(r.message));
+        tr.appendChild(td(r.date? r.date.toLocaleString('ar-SA'):'' ));
+        const act=document.createElement('td');const del=document.createElement('button');del.textContent='حذف';del.className='delete-btn';
+        del.addEventListener('click',(e)=>{e.stopPropagation();deleteMessage(r)});
+        act.appendChild(del);tr.appendChild(act);tbody.appendChild(tr);
+      }
+    }
     function td(t){const c=document.createElement('td');c.textContent=t||'';return c}
     async function markAsRead(r){if(r.read)return;try{await updateDoc(doc(db,'messages',r.id),{read:true});}catch(e){}}
     async function deleteMessage(r){if(!confirm("هل تريد حذف هذه الرسالة؟"))return;try{await deleteDoc(doc(db,'messages',r.id));showToast('تم حذف الرسالة');}catch{showToast('فشل حذف الرسالة')}}
@@ -260,51 +352,266 @@
     btnNew.addEventListener('click',()=>{currentFilter="new";setActive(btnNew);renderMsgTable()});
     btnRead.addEventListener('click',()=>{currentFilter="read";setActive(btnRead);renderMsgTable()});
     function setActive(b){[btnAll,btnNew,btnRead].forEach(x=>x.classList.remove('btn--primary'));b.classList.add('btn--primary')}
-    exportBtn.addEventListener('click',()=>{let rows=[...allRows];if(currentFilter==="new")rows=rows.filter(r=>!r.read);if(currentFilter==="read")rows=rows.filter(r=>r.read);if(rows.length===0){showToast('لا توجد بيانات للتصدير');return}const header=['الاسم','البريد','الجوال','الرسالة','التاريخ','مقروء'],lines=[header.join(',')];for(const r of rows){lines.push([csv(r.name),csv(r.email),csv(r.phone),csv(r.message),csv(r.date? r.date.toLocaleString('ar-SA'):''),csv(r.read?'نعم':'لا')].join(','));}const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='messages.csv';a.click();URL.revokeObjectURL(a.href)});function csv(v){return `"${(v??'').toString().replace(/"/g,'""')}"`}
+    exportBtn.addEventListener('click',()=>{
+      let rows=[...allRows];
+      if(currentFilter==="new")rows=rows.filter(r=>!r.read);
+      if(currentFilter==="read")rows=rows.filter(r=>r.read);
+      if(rows.length===0){showToast('لا توجد بيانات للتصدير');return}
+      const header=['الاسم','البريد','الجوال','الرسالة','التاريخ','مقروء'],lines=[header.join(',')];
+      for(const r of rows){
+        lines.push([csv(r.name),csv(r.email),csv(r.phone),csv(r.message),csv(r.date? r.date.toLocaleString('ar-SA'):''),csv(r.read?'نعم':'لا')].join(','));
+      }
+      const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='messages.csv';a.click();URL.revokeObjectURL(a.href)
+    });
+    function csv(v){return `"${(v??'').toString().replace(/"/g,'""')}"`}
 
-    /* ===== العقارات ===== */
+    // ===== العقارات + الصور المحسّنة =====
     const p_title=document.getElementById('p_title'), p_type=document.getElementById('p_type'), p_price=document.getElementById('p_price'), p_area=document.getElementById('p_area'), p_loc=document.getElementById('p_loc'), p_lat=document.getElementById('p_lat'), p_lng=document.getElementById('p_lng'), p_floor=document.getElementById('p_floor'), p_rooms=document.getElementById('p_rooms'), p_baths=document.getElementById('p_baths'), p_bounds=document.getElementById('p_bounds'), p_images=document.getElementById('p_images'), p_thumbs=document.getElementById('p_thumbs'), p_featured=document.getElementById('p_featured'), p_active=document.getElementById('p_active'), btnSave=document.getElementById('btnSave'), btnReset=document.getElementById('btnReset'), btnDeleteProp=document.getElementById('btnDeleteProp');
     const grp_floor=document.getElementById('grp_floor'), grp_rooms=document.getElementById('grp_rooms'), grp_baths=document.getElementById('grp_baths'), grp_bounds=document.getElementById('grp_bounds');
     const p_tbody=document.getElementById('p_tbody'), p_empty=document.getElementById('p_empty'), p_search=document.getElementById('p_search'), fltFeatured=document.getElementById('flt_featured'), fltActive=document.getElementById('flt_active'), chipBtns=[...document.querySelectorAll('.chipbtn')];
 
     let propsAll=[], editId=null, typeFilter='all';
 
-    function refreshTypeGroups(){const t=p_type.value;if(t==='أرض'){grp_floor.classList.add('hide');grp_rooms.classList.add('hide');grp_baths.classList.add('hide');grp_bounds.classList.remove('hide')}else if(t==='شقة'){grp_floor.classList.remove('hide');grp_rooms.classList.remove('hide');grp_baths.classList.remove('hide');grp_bounds.classList.add('hide')}else{grp_floor.classList.add('hide');grp_rooms.classList.remove('hide');grp_baths.classList.remove('hide');grp_bounds.classList.add('hide')}}
+    // حالة صور النموذج
+    let newFiles=[];               // ملفات جديدة (File[])
+    let existingUrls=[];           // روابط موجودة بالعقار عند التعديل
+    let removedExisting=new Set(); // روابط قديمة حُذفت من المعاينة
+    let coverChoice=null;          // {type:'existing'|'new', value:url|index}
+
+    function refreshTypeGroups(){
+      const t=p_type.value;
+      if(t==='أرض'){grp_floor.classList.add('hide');grp_rooms.classList.add('hide');grp_baths.classList.add('hide');grp_bounds.classList.remove('hide')}
+      else if(t==='شقة'){grp_floor.classList.remove('hide');grp_rooms.classList.remove('hide');grp_baths.classList.remove('hide');grp_bounds.classList.add('hide')}
+      else{grp_floor.classList.add('hide');grp_rooms.classList.remove('hide');grp_baths.classList.remove('hide');grp_bounds.classList.add('hide')}
+    }
     refreshTypeGroups(); p_type.addEventListener('change',refreshTypeGroups);
 
-    p_images.addEventListener('change',()=>{p_thumbs.innerHTML='';[...p_images.files].forEach(f=>{const img=document.createElement('img');img.src=URL.createObjectURL(f);p_thumbs.appendChild(img)})});
+    // معاينة الصور + أدوات X و دائرة الغلاف
+    function renderThumbs(){
+      p_thumbs.innerHTML='';
+      // صور موجودة
+      for(const url of existingUrls){
+        if(removedExisting.has(url)) continue;
+        const el=makeThumb(url, ()=>{removedExisting.add(url); if(coverChoice?.type==='existing' && coverChoice.value===url) coverChoice=null; renderThumbs();}, ()=>{coverChoice={type:'existing', value:url}; renderThumbs();});
+        if(coverChoice?.type==='existing' && coverChoice.value===url) el.classList.add('cover');
+        p_thumbs.appendChild(el);
+      }
+      // صور جديدة
+      newFiles.forEach((file,idx)=>{
+        const objectUrl = URL.createObjectURL(file);
+        const el=makeThumb(objectUrl, ()=>{
+          newFiles.splice(idx,1);
+          if(coverChoice?.type==='new' && coverChoice.value===idx) coverChoice=null;
+          renderThumbs();
+          URL.revokeObjectURL(objectUrl);
+        }, ()=>{
+          coverChoice={type:'new', value:idx};
+          renderThumbs();
+        });
+        if(coverChoice?.type==='new' && coverChoice.value===idx) el.classList.add('cover');
+        p_thumbs.appendChild(el);
+      });
+    }
 
-    async function uploadSelectedImages(propId){const files=[...p_images.files];if(files.length===0)return[];const urls=[];for(const f of files){const path=`properties/${propId}/${Date.now()}_${Math.random().toString(36).slice(2)}_${f.name}`;const r=ref(storage,path);await uploadBytes(r,f);urls.push(await getDownloadURL(r))}return urls}
+    function makeThumb(src,onDelete,onCover){
+      const box=document.createElement('div'); box.className='thumb';
+      const img=document.createElement('img'); img.src=src; img.alt='صورة للعقار';
+      const x=document.createElement('button'); x.type='button'; x.className='btn-x'; x.setAttribute('aria-label','حذف الصورة'); x.textContent='×'; x.addEventListener('click',onDelete);
+      const dot=document.createElement('button'); dot.type='button'; dot.className='cover-dot'; dot.setAttribute('aria-label','تعيين كغلاف'); dot.textContent='•'; dot.addEventListener('click',onCover);
+      box.appendChild(img); box.appendChild(x); box.appendChild(dot);
+      return box;
+    }
 
-    btnSave.addEventListener('click',async()=>{const title=(p_title.value||'').trim();if(!title){showToast('أدخل العنوان');p_title.focus();return}
-      const data={title,type:p_type.value,price:(p_price.value||'').trim(),area:(p_area.value||'').trim(),location:(p_loc.value||'').trim(),lat:parseFloat(p_lat.value)||null,lng:parseFloat(p_lng.value)||null,floor:(p_type.value==='شقة'?(p_floor.value||'').trim():null),rooms:(p_type.value!=='أرض'?(parseInt(p_rooms.value)||null):null),baths:(p_type.value!=='أرض'?(parseInt(p_baths.value)||null):null),bounds:(p_type.value==='أرض'?(p_bounds.value||'').trim():null),featured:!!p_featured.checked,active:!!p_active.checked,createdAt:serverTimestamp()};
-      try{
-        if(editId){
-          await updateDoc(doc(db,'properties',editId),data);
-          const more=await uploadSelectedImages(editId);
-          if(more.length){const snap=await getDoc(doc(db,'properties',editId));const old=(snap.data()?.images)||[];await updateDoc(doc(db,'properties',editId),{images:[...old,...more]})}
-          showToast('تم تحديث العقار');
-        }else{
-          const refDoc=await addDoc(collection(db,'properties'),{...data,images:[]});
-          const urls=await uploadSelectedImages(refDoc.id); if(urls.length){await updateDoc(refDoc,{images:urls})}
-          showToast('تم إضافة العقار');
-        }
-        resetForm();
-      }catch(e){console.error(e);showToast('تعذر الحفظ')}
+    p_images.addEventListener('change',()=>{
+      // إضافة الملفات الجديدة إلى المصفوفة (بدون رفع فوري)
+      for(const f of p_images.files){ if(/^image\//.test(f.type)) newFiles.push(f) }
+      p_images.value='';
+      renderThumbs();
     });
 
+    // رفع الملفات المحددة وإرجاع روابطها
+    async function uploadSelectedImages(propId){
+      const urls=[];
+      for(const f of newFiles){
+        const path=`properties/${propId}/${Date.now()}_${Math.random().toString(36).slice(2)}_${sanitizeName(f.name)}`;
+        const r=ref(storage,path);
+        await uploadBytes(r,f);
+        urls.push(await getDownloadURL(r));
+      }
+      return urls;
+    }
+    function sanitizeName(name){return name.replace(/[^a-zA-Z0-9._-]/g,'_')}
+
+    btnSave.addEventListener('click',async()=>{
+      const title=(p_title.value||'').trim(); if(!title){showToast('أدخل العنوان'); p_title.focus(); return}
+      const data={
+        title,
+        type:p_type.value,
+        price:(p_price.value||'').trim(),
+        area:(p_area.value||'').trim(),
+        location:(p_loc.value||'').trim(),
+        lat:parseFloat(p_lat.value)||null,
+        lng:parseFloat(p_lng.value)||null,
+        floor:(p_type.value==='شقة'?(p_floor.value||'').trim():null),
+        rooms:(p_type.value!=='أرض'?(parseInt(p_rooms.value)||null):null),
+        baths:(p_type.value!=='أرض'?(parseInt(p_baths.value)||null):null),
+        bounds:(p_type.value==='أرض'?(p_bounds.value||'').trim():null),
+        featured:!!p_featured.checked,
+        active:!!p_active.checked,
+        createdAt:serverTimestamp()
+      };
+
+      try{
+        let propId, finalImages=[], coverUrl=null;
+
+        if(editId){
+          // 1) دمج الصور الباقية من القديمة (استبعاد المحذوفة)
+          const snap=await getDoc(doc(db,'properties',editId));
+          const old=(snap.data()?.images)||[];
+          finalImages = old.filter(u=>!removedExisting.has(u));
+          // 2) حدّث الحقول
+          await updateDoc(doc(db,'properties',editId),data);
+          // 3) ارفع الجديدة وأضفها
+          const more=await uploadSelectedImages(editId);
+          finalImages = [...finalImages, ...more];
+          // 4) حدّد الغلاف
+          coverUrl = resolveCover(finalImages, more);
+          finalImages = reorderImagesWithCoverFirst(finalImages, coverUrl);
+          // 5) اكتب الصور + الغلاف
+          await updateDoc(doc(db,'properties',editId),{images:finalImages, coverUrl});
+          // 6) احذف من التخزين الروابط المحذوفة
+          for(const u of removedExisting){ try{await deleteObject(ref(storage,u))}catch{} }
+          showToast('تم تحديث العقار');
+          propId = editId;
+        }else{
+          // إنشاء مستند أولًا ليكون لدينا id للمسار
+          const refDoc=await addDoc(collection(db,'properties'),{...data,images:[]});
+          propId = refDoc.id;
+          const urls=await uploadSelectedImages(propId);
+          coverUrl = resolveCover(urls, urls); // كلها جديدة هنا
+          const ordered = reorderImagesWithCoverFirst(urls, coverUrl);
+          await updateDoc(refDoc,{images:ordered, coverUrl});
+          showToast('تم إضافة العقار');
+        }
+
+        resetForm();
+      }catch(e){
+        console.error(e);
+        showToast('تعذر الحفظ');
+      }
+    });
+
+    // تحديد الغلاف بحسب اختيار المستخدم
+    function resolveCover(allImages, newAdded){
+      if(coverChoice?.type==='existing' && allImages.includes(coverChoice.value)) return coverChoice.value;
+      if(coverChoice?.type==='new'){
+        const idx = coverChoice.value;
+        if(Number.isInteger(idx) && newAdded[idx]) return newAdded[idx];
+      }
+      // افتراضيًا: أول صورة متاحة
+      return allImages[0] || null;
+    }
+    function reorderImagesWithCoverFirst(arr, cover){
+      if(!cover) return arr;
+      const rest = arr.filter(u=>u!==cover);
+      return [cover, ...rest];
+    }
+
     btnReset.addEventListener('click',resetForm);
-    function resetForm(){editId=null;p_title.value='';p_type.value='فيلا';p_price.value='';p_area.value='';p_loc.value='';p_lat.value='';p_lng.value='';p_floor.value='';p_rooms.value='';p_baths.value='';p_bounds.value='';p_featured.checked=false;p_active.checked=true;p_images.value='';p_thumbs.innerHTML='';btnDeleteProp.style.display='none';refreshTypeGroups()}
+    function resetForm(){
+      editId=null;
+      p_title.value=''; p_type.value='فيلا'; p_price.value=''; p_area.value=''; p_loc.value='';
+      p_lat.value=''; p_lng.value=''; p_floor.value=''; p_rooms.value=''; p_baths.value=''; p_bounds.value='';
+      p_featured.checked=false; p_active.checked=true;
+      // إعادة حالة الصور
+      newFiles=[]; existingUrls=[]; removedExisting=new Set(); coverChoice=null; p_images.value='';
+      p_thumbs.innerHTML='';
+      btnDeleteProp.style.display='none';
+      refreshTypeGroups();
+    }
 
-    btnDeleteProp.addEventListener('click',async()=>{if(!editId)return;if(!confirm('هل تريد حذف هذا العقار (سيتم حذف صوره)؟'))return;try{const snap=await getDoc(doc(db,'properties',editId));const imgs=(snap.data()?.images)||[];for(const u of imgs){try{await deleteObject(ref(storage,u))}catch{}}await deleteDoc(doc(db,'properties',editId));showToast('تم حذف العقار');resetForm()}catch(e){console.error(e);showToast('فشل حذف العقار')}});
+    btnDeleteProp.addEventListener('click',async()=>{
+      if(!editId) return;
+      if(!confirm('هل تريد حذف هذا العقار (سيتم حذف صوره)؟')) return;
+      try{
+        const snap=await getDoc(doc(db,'properties',editId));
+        const imgs=(snap.data()?.images)||[];
+        for(const u of imgs){ try{await deleteObject(ref(storage,u))}catch{} }
+        await deleteDoc(doc(db,'properties',editId));
+        showToast('تم حذف العقار'); resetForm();
+      }catch(e){ console.error(e); showToast('فشل حذف العقار') }
+    });
 
-    function attachRealtimeProperties(){const q=query(collection(db,'properties'),orderBy('createdAt','desc'));onSnapshot(q,(snap)=>{propsAll=[];snap.forEach(d=>{const v=d.data();propsAll.push({id:d.id,title:v.title||'',type:v.type||'',price:v.price||'',area:v.area||'',location:v.location||'',lat:v.lat||null,lng:v.lng||null,floor:v.floor||null,rooms:v.rooms||null,baths:v.baths||null,bounds:v.bounds||null,featured:!!v.featured,active:!!v.active,images:Array.isArray(v.images)?v.images:[],createdAt:v.createdAt?.toDate?v.createdAt.toDate():null});});renderProps()},()=>showToast('تعذر تحميل العقارات'))}
+    function attachRealtimeProperties(){
+      const q=query(collection(db,'properties'),orderBy('createdAt','desc'));
+      onSnapshot(q,(snap)=>{
+        propsAll=[];
+        snap.forEach(d=>{
+          const v=d.data();
+          propsAll.push({
+            id:d.id,title:v.title||'',type:v.type||'',price:v.price||'',area:v.area||'',location:v.location||'',
+            lat:v.lat||null,lng:v.lng||null,floor:v.floor||null,rooms:v.rooms||null,baths:v.baths||null,bounds:v.bounds||null,
+            featured:!!v.featured,active:!!v.active,images:Array.isArray(v.images)?v.images:[],coverUrl:v.coverUrl||null,
+            createdAt:v.createdAt?.toDate?v.createdAt.toDate():null
+          });
+        });
+        renderProps()
+      },()=>showToast('تعذر تحميل العقارات'))
+    }
 
-    function renderProps(){const q=(p_search.value||'').toLowerCase().trim();let rows=propsAll.filter(r=>{if(typeFilter!=='all'&&r.type!==typeFilter)return false;if(fltFeatured.checked&&!r.featured)return false;if(fltActive.checked&&!r.active)return false;return (r.title+r.type+r.location).toLowerCase().includes(q)});p_tbody.innerHTML='';if(rows.length===0){p_empty.style.display='block';return}p_empty.style.display='none';for(const r of rows){const tr=document.createElement('tr');tr.appendChild(td(r.title));tr.appendChild(td(r.type));tr.appendChild(td(r.price||''));tr.appendChild(toggleCell(r,'featured','مميز'));tr.appendChild(toggleCell(r,'active','ظاهر'));const act=document.createElement('td');const e=document.createElement('button');e.className='btn';e.textContent='تعديل';e.addEventListener('click',()=>fillForm(r));const d=document.createElement('button');d.className='btn danger';d.textContent='حذف';d.addEventListener('click',()=>deleteProperty(r));act.appendChild(e);act.appendChild(document.createTextNode(' '));act.appendChild(d);tr.appendChild(act);p_tbody.appendChild(tr)}}
-    function toggleCell(r,field,label){const td=document.createElement('td');const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!r[field];cb.addEventListener('change',async()=>{try{await updateDoc(doc(db,'properties',r.id),{[field]:cb.checked});showToast(cb.checked?`تم تفعيل ${label}`:`تم إلغاء ${label}`)}catch(e){cb.checked=!cb.checked;showToast('فشل التحديث')}});td.appendChild(cb);return td}
-    function fillForm(r){editId=r.id;p_title.value=r.title;p_type.value=r.type;p_price.value=r.price;p_area.value=r.area;p_loc.value=r.location;p_lat.value=r.lat??'';p_lng.value=r.lng??'';p_floor.value=r.floor??'';p_rooms.value=r.rooms??'';p_baths.value=r.baths??'';p_bounds.value=r.bounds??'';p_featured.checked=r.featured;p_active.checked=r.active;p_thumbs.innerHTML='';r.images.forEach(u=>{const i=document.createElement('img');i.src=u;p_thumbs.appendChild(i)});btnDeleteProp.style.display='inline-block';refreshTypeGroups();propsSection.scrollIntoView({behavior:'smooth'})}
-    async function deleteProperty(r){if(!confirm('حذف هذا العقار مع صوره؟'))return;try{for(const u of (r.images||[])){try{await deleteObject(ref(storage,u))}catch{}}await deleteDoc(doc(db,'properties',r.id));showToast('تم حذف العقار');if(editId===r.id)resetForm()}catch(e){showToast('فشل حذف العقار')}}
-    p_search.addEventListener('input',renderProps);fltFeatured.addEventListener('change',renderProps);fltActive.addEventListener('change',renderProps);chipBtns.forEach(b=>b.addEventListener('click',()=>{chipBtns.forEach(x=>x.classList.remove('active'));b.classList.add('active');typeFilter=b.dataset.type;renderProps()}));
+    function renderProps(){
+      const q=(p_search.value||'').toLowerCase().trim();
+      let rows=propsAll.filter(r=>{
+        if(typeFilter!=='all'&&r.type!==typeFilter) return false;
+        if(fltFeatured.checked&&!r.featured) return false;
+        if(fltActive.checked&&!r.active) return false;
+        return (r.title+r.type+r.location).toLowerCase().includes(q);
+      });
+      p_tbody.innerHTML='';
+      if(rows.length===0){p_empty.style.display='block';return}
+      p_empty.style.display='none';
+      for(const r of rows){
+        const tr=document.createElement('tr');
+        tr.appendChild(td(r.title)); tr.appendChild(td(r.type)); tr.appendChild(td(r.price||''));
+        tr.appendChild(toggleCell(r,'featured','مميز')); tr.appendChild(toggleCell(r,'active','ظاهر'));
+        const act=document.createElement('td');
+        const e=document.createElement('button'); e.className='btn'; e.textContent='تعديل'; e.addEventListener('click',()=>fillForm(r));
+        const d=document.createElement('button'); d.className='btn danger'; d.textContent='حذف'; d.addEventListener('click',()=>deleteProperty(r));
+        act.appendChild(e); act.appendChild(document.createTextNode(' ')); act.appendChild(d);
+        tr.appendChild(act); p_tbody.appendChild(tr);
+      }
+    }
+    function toggleCell(r,field,label){
+      const td=document.createElement('td'); const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!r[field];
+      cb.addEventListener('change',async()=>{try{await updateDoc(doc(db,'properties',r.id),{[field]:cb.checked});showToast(cb.checked?`تم تفعيل ${label}`:`تم إلغاء ${label}`)}catch(e){cb.checked=!cb.checked;showToast('فشل التحديث')}});
+      td.appendChild(cb); return td;
+    }
+    function fillForm(r){
+      editId=r.id;
+      // حقول النص
+      p_title.value=r.title; p_type.value=r.type; p_price.value=r.price; p_area.value=r.area; p_loc.value=r.location;
+      p_lat.value=r.lat??''; p_lng.value=r.lng??''; p_floor.value=r.floor??''; p_rooms.value=r.rooms??''; p_baths.value=r.baths??''; p_bounds.value=r.bounds??'';
+      p_featured.checked=r.featured; p_active.checked=r.active;
+      // الصور: اجعل القائمة من جديد
+      newFiles=[]; existingUrls=[...(Array.isArray(r.images)?r.images:[])]; removedExisting=new Set();
+      coverChoice = r.coverUrl ? {type:'existing', value:r.coverUrl} : (existingUrls[0]? {type:'existing', value:existingUrls[0]} : null);
+      renderThumbs();
+      btnDeleteProp.style.display='inline-block';
+      refreshTypeGroups(); propsSection.scrollIntoView({behavior:'smooth'});
+    }
+    async function deleteProperty(r){
+      if(!confirm('حذف هذا العقار مع صوره؟')) return;
+      try{
+        for(const u of (r.images||[])){ try{await deleteObject(ref(storage,u))}catch{} }
+        await deleteDoc(doc(db,'properties',r.id));
+        showToast('تم حذف العقار'); if(editId===r.id) resetForm();
+      }catch(e){ showToast('فشل حذف العقار') }
+    }
+    p_search.addEventListener('input',renderProps);
+    fltFeatured.addEventListener('change',renderProps);
+    fltActive.addEventListener('change',renderProps);
+    chipBtns.forEach(b=>b.addEventListener('click',()=>{chipBtns.forEach(x=>x.classList.remove('active'));b.classList.add('active');typeFilter=b.dataset.type;renderProps()}));
   </script>
 </body>
 </html>
